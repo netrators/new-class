@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Road to the Title - Masterclass 1</title>
     
     <!-- Google Fonts: Playfair Display for elegance, Poppins for modern readability -->
@@ -16,7 +16,7 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Custom Styles & Advanced Animations -->
+    <!-- Custom Styles & Advanced 60fps Animations -->
     <style>
         :root {
             --primary-blue: #1e40af;
@@ -25,12 +25,15 @@
             --bg-light: #f8fafc;
         }
 
+        /* Base & Scroll Behavior */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-light); 
             color: #0f172a; 
             overflow-x: hidden;
             scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         h1, h2, h3, h4, .serif-font {
@@ -38,34 +41,65 @@
         }
 
         /* =========================================
-           ADVANCED ANIMATIONS & GLOW EFFECTS
+           ADVANCED ANIMATIONS & GLOW EFFECTS (60fps)
            ========================================= */
 
-        /* Enhanced Flip Card 3D Setup */
-        .perspective-1000 { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
+        /* Force Hardware Acceleration for smooth 60fps rendering */
+        .gpu-accelerated {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+            will-change: transform, opacity;
+        }
+
+        /* Enhanced Flip Card 3D Setup (Touch optimized) */
+        .perspective-1000 { 
+            perspective: 1000px; 
+            -webkit-perspective: 1000px;
+        }
+        .transform-style-3d { 
+            transform-style: preserve-3d; 
+            -webkit-transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .backface-hidden { 
+            backface-visibility: hidden; 
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 { 
+            transform: rotateY(180deg); 
+            -webkit-transform: rotateY(180deg);
+        }
         
         /* Glow Hover Effects */
         .glow-hover {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform, box-shadow;
         }
-        .glow-hover:hover {
-            box-shadow: 0 15px 35px var(--primary-glow), inset 0 0 15px rgba(255,255,255,0.5);
-            border-color: #3b82f6;
-            transform: translateY(-8px) scale(1.02);
-            z-index: 10;
+        
+        /* Only apply hover effects on devices that support hover (desktop) */
+        @media (hover: hover) {
+            .glow-hover:hover {
+                box-shadow: 0 15px 35px var(--primary-glow), inset 0 0 15px rgba(255,255,255,0.5);
+                border-color: #3b82f6;
+                transform: translateY(-8px) scale(1.02);
+                z-index: 10;
+            }
+            .icon-glow:hover {
+                filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.8));
+                transform: scale(1.1);
+                transition: transform 0.2s ease, filter 0.2s ease;
+            }
+        }
+
+        /* Active state for mobile touches to simulate feedback */
+        .glow-hover:active {
+            transform: scale(0.98);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
         }
 
         .text-glow {
             text-shadow: 0 0 15px rgba(37, 99, 235, 0.6);
-        }
-
-        .icon-glow:hover {
-            filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.8));
-            transform: scale(1.1);
-            transition: all 0.2s ease;
         }
 
         /* Shimmer Effect for important titles */
@@ -76,6 +110,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             animation: shimmer 3s linear infinite;
+            will-change: background-position;
         }
 
         @keyframes shimmer {
@@ -84,43 +119,38 @@
 
         /* Floating elements animation */
         .float-anim {
-            animation: floating 3s ease-in-out infinite;
+            animation: floating 4s ease-in-out infinite;
+            will-change: transform;
         }
         @keyframes floating {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-12px); }
             100% { transform: translateY(0px); }
-        }
-
-        /* Pulse ring animation for recording */
-        .pulse-ring {
-            animation: pulsing 2s infinite cubic-bezier(0.66, 0, 0, 1);
-        }
-        @keyframes pulsing {
-            to { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
         }
 
         /* Smooth Section Fade In */
         .animate-fade-in {
-            animation: fadeInScale 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+            animation: fadeInScale 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
             opacity: 0;
+            will-change: opacity, transform;
         }
         @keyframes fadeInScale {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Confetti Overlay Animations */
+        /* Confetti Overlay Animations (Optimized for Mobile) */
         @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg) scale(1); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+            0% { transform: translate3d(0, -10vh, 0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translate3d(0, 110vh, 0) rotate(720deg) scale(0.5); opacity: 0; }
         }
         .confetti {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             animation: fall 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
             z-index: 1000;
+            will-change: transform, opacity;
         }
 
         /* =========================================
@@ -128,34 +158,35 @@
            ========================================= */
 
         /* Custom Scrollbar - Minimalist & Elegant */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         /* Hide scrollbar strictly for the teleprompter for realism */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Custom Range Slider */
+        /* Custom Range Slider (Mobile friendly touch targets) */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
             background: transparent;
+            height: 24px; /* Larger touch area */
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
+            height: 24px;
+            width: 24px;
             border-radius: 50%;
             background: #2563eb;
             cursor: pointer;
-            margin-top: -8px;
+            margin-top: -10px;
             box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
             transition: transform 0.1s;
         }
-        input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(1.3);
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
@@ -182,39 +213,71 @@
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
             background-size: 20px 20px;
         }
+
+        /* Mobile Sidebar transitions */
+        .sidebar-transition {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
     </style>
 </head>
-<body class="min-h-screen flex w-full bg-slate-50 text-slate-900 overflow-hidden">
+<body class="flex flex-col lg:flex-row w-full bg-slate-50 text-slate-900 overflow-hidden h-screen gpu-accelerated">
 
     <!-- =========================================
-         CELEBRATION OVERLAY
+         CELEBRATION OVERLAY (GPU Accelerated)
          ========================================= -->
-    <div id="celebration-overlay" class="fixed inset-0 z-[100] pointer-events-none overflow-hidden hidden">
+    <div id="celebration-overlay" class="fixed inset-0 z-[100] pointer-events-none overflow-hidden hidden gpu-accelerated">
         <div id="confetti-container" class="absolute inset-0"></div>
         <div class="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-md transition-opacity duration-500">
-            <div class="text-center p-16 bg-white border border-blue-100 shadow-2xl rounded-3xl transform scale-110 transition-transform duration-700 glow-hover">
-                <div class="relative inline-block mb-8">
+            <div class="text-center p-8 md:p-16 bg-white border border-blue-100 shadow-2xl rounded-3xl transform scale-110 transition-transform duration-700 w-[90%] max-w-lg">
+                <div class="relative inline-block mb-6 md:mb-8">
                     <div class="absolute inset-0 bg-blue-400 blur-xl opacity-50 rounded-full float-anim"></div>
-                    <i data-lucide="trophy" class="w-24 h-24 text-blue-600 relative z-10 float-anim"></i>
+                    <i data-lucide="trophy" class="w-20 h-20 md:w-24 md:h-24 text-blue-600 relative z-10 float-anim"></i>
                 </div>
-                <h1 class="text-6xl text-blue-900 mb-4 serif-font font-bold shimmer-text">¡Misión Cumplida!</h1>
-                <p class="text-2xl text-slate-600 font-light">Has elevado tu nivel de proyección internacional.</p>
-                <div class="mt-10 pt-8 border-t border-slate-100">
-                    <p class="text-sm text-slate-400 uppercase tracking-widest font-bold mb-2">Puntuación Final de Desempeño</p>
-                    <p id="final-celebration-score" class="text-7xl text-blue-600 font-extrabold serif-font text-glow">100%</p>
+                <h1 class="text-4xl md:text-6xl text-blue-900 mb-4 serif-font font-bold shimmer-text leading-tight">¡Misión Cumplida!</h1>
+                <p class="text-lg md:text-2xl text-slate-600 font-light">Has elevado tu nivel de proyección internacional.</p>
+                <div class="mt-8 md:mt-10 pt-6 md:pt-8 border-t border-slate-100">
+                    <p class="text-xs md:text-sm text-slate-400 uppercase tracking-widest font-bold mb-2">Puntuación Final</p>
+                    <p id="final-celebration-score" class="text-6xl md:text-7xl text-blue-600 font-extrabold serif-font text-glow">100%</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- =========================================
-         SIDEBAR NAVIGATION
+         MOBILE HEADER (Only visible on small screens)
          ========================================= -->
-    <div class="w-80 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] shrink-0 transition-all duration-300 relative">
+    <header class="lg:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 shadow-sm z-40 relative">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center border border-blue-100">
+                <i data-lucide="globe" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-slate-900 serif-font leading-none">Road to the Title</h1>
+                <span class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Masterclass 1</span>
+            </div>
+        </div>
+        <button onclick="toggleMobileMenu()" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </header>
+
+    <!-- =========================================
+         SIDEBAR NAVIGATION (Drawer on Mobile, Static on Desktop)
+         ========================================= -->
+    <!-- Mobile Overlay -->
+    <div id="sidebar-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+    
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 md:w-80 bg-white border-r border-slate-200 flex flex-col shadow-2xl lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] shrink-0 sidebar-transition -translate-x-full lg:relative lg:translate-x-0">
         <!-- Decorative Header Background -->
         <div class="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-blue-50 to-white -z-10"></div>
         
-        <div class="p-8 text-center border-b border-slate-100/50 mt-4">
+        <!-- Mobile close button -->
+        <button onclick="toggleMobileMenu()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 bg-white/50 rounded-full lg:hidden backdrop-blur-md">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="p-8 text-center border-b border-slate-100/50 mt-4 hidden lg:block">
             <div class="w-20 h-20 mx-auto bg-white text-blue-600 rounded-full flex items-center justify-center mb-5 border-2 border-blue-100 shadow-lg shadow-blue-100/50 float-anim relative">
                 <div class="absolute inset-0 rounded-full border border-blue-400/30 animate-[ping_3s_linear_infinite]"></div>
                 <i data-lucide="globe" class="w-10 h-10"></i>
@@ -222,88 +285,83 @@
             <h1 class="text-2xl font-bold text-slate-900 serif-font tracking-tight">Road to the Title</h1>
             <p class="text-xs text-blue-600 font-bold tracking-widest uppercase mt-2 bg-blue-50 inline-block px-3 py-1 rounded-full">Masterclass 1</p>
         </div>
+        
+        <!-- Mobile padding filler -->
+        <div class="h-20 lg:hidden flex items-center px-6 border-b border-slate-100">
+            <h2 class="font-bold text-slate-800 text-lg serif-font">Menú del Curso</h2>
+        </div>
 
         <nav class="flex-1 overflow-y-auto py-6 hide-scrollbar">
-            <ul class="space-y-2 px-5" id="nav-menu">
-                <!-- Navigation items dynamically injected via JS to avoid repetition -->
+            <ul class="space-y-2 px-4 md:px-5" id="nav-menu">
+                <!-- Navigation items dynamically injected via JS -->
             </ul>
         </nav>
-
-        <!-- Teacher Notes Toggle Button -->
+        
         <div class="p-5 border-t border-slate-100 bg-slate-50">
-            <button id="toggle-notes-btn" onclick="toggleTeacherNotes()" class="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:shadow-md active:scale-95">
-                <i data-lucide="eye" class="w-5 h-5 text-blue-500"></i>
-                <span id="toggle-notes-text">Modo Instructor (Oculto)</span>
-            </button>
-            <p class="text-[10px] text-center text-slate-400 mt-2 uppercase tracking-wider font-semibold">Revela tips exclusivos para ti</p>
+            <p class="text-[10px] text-center text-slate-400 uppercase tracking-wider font-semibold"><i data-lucide="shield-check" class="w-3 h-3 inline pb-0.5"></i> Sistema de Preparación Oficial</p>
         </div>
-    </div>
+    </aside>
 
     <!-- =========================================
          MAIN CONTENT AREA
          ========================================= -->
-    <main class="flex-1 h-screen overflow-y-auto relative scroll-smooth p-6 md:p-10 lg:p-14 bg-pattern">
-        <div class="max-w-5xl mx-auto w-full relative pb-20">
-
-            <!-- Global Teacher Alert (Shows when instructor mode is active) -->
-            <div id="global-instructor-alert" class="hidden mb-6 bg-blue-600 text-white p-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 animate-fade-in font-medium text-sm">
-                <i data-lucide="eye" class="w-4 h-4"></i> El Modo Instructor está ACTIVO. Las notas azules solo son visibles para ti.
-            </div>
+    <main id="main-content" class="flex-1 h-[calc(100vh-73px)] lg:h-screen overflow-y-auto relative scroll-smooth p-4 md:p-8 lg:p-10 bg-pattern w-full">
+        <div class="max-w-5xl mx-auto w-full relative pb-24 lg:pb-20">
 
             <!-- ================= SECTION 0: Welcome ================= -->
             <div id="section-0" class="section-container animate-fade-in block">
-                <div class="bg-white rounded-[2rem] p-10 md:p-16 border border-slate-200 shadow-xl shadow-slate-200/50 relative overflow-hidden group">
+                <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-12 lg:p-16 border border-slate-200 shadow-xl shadow-slate-200/50 relative overflow-hidden group">
                     <!-- Decorative background elements -->
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-60 -translate-y-1/2 translate-x-1/4 transition-transform duration-1000 group-hover:scale-150"></div>
-                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-indigo-50 rounded-full blur-2xl opacity-60 translate-y-1/4 -translate-x-1/4"></div>
+                    <div class="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-blue-50 rounded-full blur-3xl opacity-60 -translate-y-1/2 translate-x-1/4 transition-transform duration-1000 group-hover:scale-150"></div>
+                    <div class="absolute bottom-0 left-0 w-40 md:w-48 h-40 md:h-48 bg-indigo-50 rounded-full blur-2xl opacity-60 translate-y-1/4 -translate-x-1/4"></div>
                     
                     <div class="relative z-10">
                         <div class="badge bg-blue-100 text-blue-700 mb-6 shadow-sm border border-blue-200">
                             <i data-lucide="star" class="w-3.5 h-3.5 mr-1.5"></i> Módulo de Preparación
                         </div>
                         
-                        <h1 class="text-5xl lg:text-7xl font-bold mb-6 serif-font leading-tight text-slate-900">
+                        <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 serif-font leading-tight text-slate-900">
                             The Ultimate <br/>
                             <span class="text-blue-600 relative inline-block">
                                 First Impression
-                                <svg class="absolute w-full h-3 -bottom-1 left-0 text-blue-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="transparent"/></svg>
+                                <svg class="absolute w-full h-2 md:h-3 -bottom-1 left-0 text-blue-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="transparent"/></svg>
                             </span>
                         </h1>
                         
-                        <p class="text-xl text-slate-600 max-w-2xl mb-12 leading-relaxed font-light">
+                        <p class="text-base md:text-lg lg:text-xl text-slate-600 max-w-2xl mb-10 md:mb-12 leading-relaxed font-light">
                             En un certamen o representación internacional, los <strong class="text-slate-900 font-semibold">primeros 10 segundos</strong> determinan cómo el jurado y el público perciben tu liderazgo. Hoy diseñaremos tu pasarela verbal y tu proyección escénica.
                         </p>
 
-                        <!-- Pillar Cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
-                            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow glow-hover">
-                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-5 text-blue-600 border border-blue-100">
-                                    <i data-lucide="mic-2" class="w-6 h-6"></i>
+                        <!-- Pillar Cards (Responsive Grid) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-14">
+                            <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow glow-hover">
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 md:mb-5 text-blue-600 border border-blue-100">
+                                    <i data-lucide="mic-2" class="w-5 h-5 md:w-6 md:h-6"></i>
                                 </div>
-                                <h3 class="font-bold text-slate-900 mb-2 text-lg">Proyección Vocal</h3>
-                                <p class="text-sm text-slate-500 leading-relaxed">Ejercicios para encontrar tu tono de autoridad y claridad frente al micrófono.</p>
+                                <h3 class="font-bold text-slate-900 mb-2 text-base md:text-lg">Proyección Vocal</h3>
+                                <p class="text-xs md:text-sm text-slate-500 leading-relaxed">Ejercicios para encontrar tu tono de autoridad y claridad frente al micrófono.</p>
                             </div>
-                            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow glow-hover">
-                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-5 text-blue-600 border border-blue-100">
-                                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow glow-hover">
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 md:mb-5 text-blue-600 border border-blue-100">
+                                    <i data-lucide="shield-check" class="w-5 h-5 md:w-6 md:h-6"></i>
                                 </div>
-                                <h3 class="font-bold text-slate-900 mb-2 text-lg">Estructura Segura</h3>
-                                <p class="text-sm text-slate-500 leading-relaxed">Fórmulas gramaticales infalibles para que tu mente nunca se quede en blanco.</p>
+                                <h3 class="font-bold text-slate-900 mb-2 text-base md:text-lg">Estructura Segura</h3>
+                                <p class="text-xs md:text-sm text-slate-500 leading-relaxed">Fórmulas gramaticales infalibles para que tu mente nunca se quede en blanco.</p>
                             </div>
-                            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow glow-hover">
-                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-5 text-blue-600 border border-blue-100">
-                                    <i data-lucide="globe-2" class="w-6 h-6"></i>
+                            <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-shadow glow-hover sm:col-span-2 md:col-span-1">
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 md:mb-5 text-blue-600 border border-blue-100">
+                                    <i data-lucide="globe-2" class="w-5 h-5 md:w-6 md:h-6"></i>
                                 </div>
-                                <h3 class="font-bold text-slate-900 mb-2 text-lg">Diplomacia</h3>
-                                <p class="text-sm text-slate-500 leading-relaxed">Vocabulario de alto impacto que demuestra tu preparación cultural.</p>
+                                <h3 class="font-bold text-slate-900 mb-2 text-base md:text-lg">Diplomacia</h3>
+                                <p class="text-xs md:text-sm text-slate-500 leading-relaxed">Vocabulario de alto impacto que demuestra tu preparación y nivel cultural.</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-4">
-                            <button onclick="goToSection(1)" class="bg-blue-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-[0_8px_20px_rgba(37,99,235,0.3)] hover:shadow-[0_12px_25px_rgba(37,99,235,0.4)] hover:-translate-y-1 flex items-center gap-3">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <button onclick="goToSection(1)" class="w-full sm:w-auto bg-blue-600 text-white px-8 md:px-10 py-4 rounded-xl font-bold text-base md:text-lg hover:bg-blue-700 transition-all shadow-[0_8px_20px_rgba(37,99,235,0.3)] hover:shadow-[0_12px_25px_rgba(37,99,235,0.4)] hover:-translate-y-1 flex justify-center items-center gap-3">
                                 Iniciar Entrenamiento <i data-lucide="arrow-right" class="w-5 h-5"></i>
                             </button>
-                            <span class="text-sm font-medium text-slate-400"><i data-lucide="clock" class="w-4 h-4 inline pb-0.5"></i> Duración est. 60 min</span>
+                            <span class="text-sm font-medium text-slate-400 self-center"><i data-lucide="clock" class="w-4 h-4 inline pb-0.5"></i> Duración est. 60 min</span>
                         </div>
                     </div>
                 </div>
@@ -311,79 +369,68 @@
 
             <!-- ================= SECTION 1: Greeting ================= -->
             <div id="section-1" class="section-container animate-fade-in hidden">
-                <div class="mb-10 flex flex-col items-start">
+                <div class="mb-8 md:mb-10 flex flex-col items-start">
                     <div class="badge bg-slate-200 text-slate-600 mb-3">Fase 1 de 6</div>
-                    <h1 class="text-4xl md:text-5xl font-bold serif-font text-slate-900">The Power Greeting</h1>
-                    <p class="text-lg text-slate-500 mt-3 max-w-2xl">Diferenciando el inglés casual del inglés diplomático. Un embajador cultural se nota desde su primera palabra.</p>
-                </div>
-
-                <!-- Instructor Note -->
-                <div class="teacher-note hidden mb-10 p-6 border-2 border-blue-300 bg-blue-50 rounded-2xl flex gap-4 text-blue-900 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
-                    <i data-lucide="book-open-check" class="shrink-0 text-blue-600 mt-1 w-6 h-6"></i>
-                    <div>
-                        <h4 class="font-bold text-blue-800 mb-2 text-lg uppercase tracking-wider text-xs">Instrucción para el Coach</h4>
-                        <p class="text-sm leading-relaxed mb-2">Haz que escuche el audio primero y luego repita. Corrige enfáticamente el sonido de la "v" en <em>evening</em> (debe vibrar el labio inferior, no sonar como "b" de burro).</p>
-                        <p class="text-sm leading-relaxed font-semibold">Pregunta rompehielo: <span class="font-normal italic">"¿Por qué crees que no deberías decir 'Hey guys' a un jurado de 60 años?"</span></p>
-                    </div>
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold serif-font text-slate-900">The Power Greeting</h1>
+                    <p class="text-base md:text-lg text-slate-500 mt-3 max-w-2xl">Diferenciando el inglés casual del inglés diplomático. Un embajador cultural se nota desde su primera palabra.</p>
                 </div>
 
                 <!-- Content Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
                     <!-- Formal Column -->
-                    <div class="space-y-5">
-                        <div class="flex items-center gap-3 mb-6 pb-2 border-b-2 border-slate-100">
-                            <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
+                    <div class="space-y-4 md:space-y-5">
+                        <div class="flex items-center gap-3 mb-4 md:mb-6 pb-2 border-b-2 border-slate-100">
+                            <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
                                 <i data-lucide="check" class="w-5 h-5"></i>
                             </div>
-                            <h3 class="text-2xl font-bold text-slate-800 serif-font">Formal (Diplomático)</h3>
+                            <h3 class="text-xl md:text-2xl font-bold text-slate-800 serif-font">Formal (Diplomático)</h3>
                         </div>
                         
-                        <!-- Cards are dynamically injected, but here is the manual robust HTML structure for demonstration -->
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer glow-hover relative overflow-hidden">
-                            <div class="absolute -right-10 -top-10 w-24 h-24 bg-emerald-50 rounded-full blur-xl group-hover:bg-emerald-100 transition-colors"></div>
+                        <!-- Cards -->
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer glow-hover relative overflow-hidden">
+                            <div class="absolute -right-10 -top-10 w-24 h-24 bg-emerald-50 rounded-full blur-xl group-hover:bg-emerald-100 transition-colors hidden md:block"></div>
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
-                                    <h4 class="text-2xl font-bold text-slate-900 mb-1 group-hover:text-emerald-700 transition-colors">"Good evening"</h4>
-                                    <p class="text-slate-500 font-medium">Buenas noches</p>
+                                    <h4 class="text-xl md:text-2xl font-bold text-slate-900 mb-1 group-hover:text-emerald-700 transition-colors">"Good evening"</h4>
+                                    <p class="text-slate-500 text-sm md:text-base font-medium">Buenas noches</p>
                                 </div>
-                                <button onclick="speakText('Good evening')" class="text-slate-400 group-hover:text-blue-600 p-3 rounded-full hover:bg-blue-50 transition-colors icon-glow bg-slate-50">
+                                <button onclick="speakText('Good evening')" class="text-slate-400 group-hover:text-blue-600 p-3 rounded-full hover:bg-blue-50 transition-colors icon-glow bg-slate-50 active:bg-blue-100">
                                     <i data-lucide="volume-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
-                            <div class="mt-5 text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100 relative z-10">
+                            <div class="mt-4 md:mt-5 text-xs md:text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100 relative z-10">
                                 <span class="font-bold text-emerald-700 flex items-center gap-1 mb-1"><i data-lucide="info" class="w-4 h-4"></i> Contexto Ideal:</span> 
                                 El saludo estándar y más elegante para iniciar ante el jurado en eventos nocturnos.
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer glow-hover">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer glow-hover">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="text-2xl font-bold text-slate-900 mb-1 group-hover:text-emerald-700 transition-colors">"It is an honor"</h4>
-                                    <p class="text-slate-500 font-medium">Es un honor</p>
+                                    <h4 class="text-xl md:text-2xl font-bold text-slate-900 mb-1 group-hover:text-emerald-700 transition-colors">"It is an honor"</h4>
+                                    <p class="text-slate-500 text-sm md:text-base font-medium">Es un honor</p>
                                 </div>
-                                <button onclick="speakText('It is an honor to be here')" class="text-slate-400 group-hover:text-blue-600 p-3 rounded-full hover:bg-blue-50 transition-colors icon-glow bg-slate-50">
+                                <button onclick="speakText('It is an honor to be here')" class="text-slate-400 group-hover:text-blue-600 p-3 rounded-full hover:bg-blue-50 transition-colors icon-glow bg-slate-50 active:bg-blue-100">
                                     <i data-lucide="volume-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
-                            <div class="mt-5 text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div class="mt-4 md:mt-5 text-xs md:text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">
                                 <span class="font-bold text-emerald-700 flex items-center gap-1 mb-1"><i data-lucide="info" class="w-4 h-4"></i> Contexto Ideal:</span> 
                                 Una frase de seguimiento perfecta que demuestra humildad, clase y respeto absoluto.
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer glow-hover">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer glow-hover">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="text-2xl font-bold text-slate-900 mb-1 group-hover:text-emerald-700 transition-colors">"Distinguished panel"</h4>
-                                    <p class="text-slate-500 font-medium">Panel distinguido (Jurado)</p>
+                                    <h4 class="text-xl md:text-2xl font-bold text-slate-900 mb-1 group-hover:text-emerald-700 transition-colors">"Distinguished panel"</h4>
+                                    <p class="text-slate-500 text-sm md:text-base font-medium">Panel distinguido (Jurado)</p>
                                 </div>
-                                <button onclick="speakText('Good evening, distinguished panel')" class="text-slate-400 group-hover:text-blue-600 p-3 rounded-full hover:bg-blue-50 transition-colors icon-glow bg-slate-50">
+                                <button onclick="speakText('Good evening, distinguished panel')" class="text-slate-400 group-hover:text-blue-600 p-3 rounded-full hover:bg-blue-50 transition-colors icon-glow bg-slate-50 active:bg-blue-100">
                                     <i data-lucide="volume-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
-                            <div class="mt-5 text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div class="mt-4 md:mt-5 text-xs md:text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">
                                 <span class="font-bold text-emerald-700 flex items-center gap-1 mb-1"><i data-lucide="info" class="w-4 h-4"></i> Contexto Ideal:</span> 
                                 Nivel avanzado. Úsalo si quieres sonar sumamente preparado e impresionar desde el inicio.
                             </div>
@@ -391,40 +438,40 @@
                     </div>
 
                     <!-- Informal Column -->
-                    <div class="space-y-5">
-                        <div class="flex items-center gap-3 mb-6 pb-2 border-b-2 border-slate-100">
-                            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 shadow-sm">
+                    <div class="space-y-4 md:space-y-5">
+                        <div class="flex items-center gap-3 mb-4 md:mb-6 pb-2 border-b-2 border-slate-100">
+                            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 shadow-sm shrink-0">
                                 <i data-lucide="x" class="w-5 h-5"></i>
                             </div>
-                            <h3 class="text-2xl font-bold text-slate-500 serif-font">Casual (Evitar en etapa)</h3>
+                            <h3 class="text-xl md:text-2xl font-bold text-slate-500 serif-font">Casual (Evitar en etapa)</h3>
                         </div>
 
-                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 border-l-4 border-l-slate-300 opacity-80 hover:opacity-100 transition-opacity">
+                        <div class="bg-slate-50 p-5 md:p-6 rounded-2xl border border-slate-200 border-l-4 border-l-slate-300 opacity-80 hover:opacity-100 transition-opacity">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="text-xl font-bold text-slate-500 mb-1 line-through decoration-red-400 decoration-2">"Hey guys"</h4>
-                                    <p class="text-slate-400 font-medium">Hola chicos</p>
+                                    <h4 class="text-lg md:text-xl font-bold text-slate-500 mb-1 line-through decoration-red-400 decoration-2">"Hey guys"</h4>
+                                    <p class="text-slate-400 text-sm md:text-base font-medium">Hola chicos</p>
                                 </div>
-                                <button onclick="speakText('Hey guys')" class="text-slate-300 hover:text-red-500 p-2 transition-colors">
-                                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                                <button onclick="speakText('Hey guys')" class="text-slate-300 hover:text-red-500 p-2 transition-colors active:text-red-600">
+                                    <i data-lucide="volume-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
-                            <div class="mt-4 text-xs text-slate-500 bg-white p-4 rounded-xl border border-slate-200">
-                                <span class="font-bold text-red-500 block mb-1">Peligro:</span> Excesivamente informal. Resta autoridad y puede ofender a jurados de mayor edad o conservadores.
+                            <div class="mt-4 text-xs md:text-sm text-slate-500 bg-white p-4 rounded-xl border border-slate-200">
+                                <span class="font-bold text-red-500 block mb-1">Peligro:</span> Excesivamente informal. Resta autoridad y puede ofender a jurados conservadores.
                             </div>
                         </div>
 
-                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 border-l-4 border-l-slate-300 opacity-80 hover:opacity-100 transition-opacity">
+                        <div class="bg-slate-50 p-5 md:p-6 rounded-2xl border border-slate-200 border-l-4 border-l-slate-300 opacity-80 hover:opacity-100 transition-opacity">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="text-xl font-bold text-slate-500 mb-1 line-through decoration-red-400 decoration-2">"What's up"</h4>
-                                    <p class="text-slate-400 font-medium">Qué tal / Qué onda</p>
+                                    <h4 class="text-lg md:text-xl font-bold text-slate-500 mb-1 line-through decoration-red-400 decoration-2">"What's up"</h4>
+                                    <p class="text-slate-400 text-sm md:text-base font-medium">Qué tal / Qué onda</p>
                                 </div>
-                                <button onclick="speakText('What is up')" class="text-slate-300 hover:text-red-500 p-2 transition-colors">
-                                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                                <button onclick="speakText('What is up')" class="text-slate-300 hover:text-red-500 p-2 transition-colors active:text-red-600">
+                                    <i data-lucide="volume-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
-                            <div class="mt-4 text-xs text-slate-500 bg-white p-4 rounded-xl border border-slate-200">
+                            <div class="mt-4 text-xs md:text-sm text-slate-500 bg-white p-4 rounded-xl border border-slate-200">
                                 <span class="font-bold text-red-500 block mb-1">Peligro:</span> Es un saludo de calle o entre amigos. Elimínalo por completo de tu vocabulario de certamen.
                             </div>
                         </div>
@@ -434,24 +481,24 @@
                 <!-- Pro Tip Box -->
                 <div class="mt-10 bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
                     <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
-                        <i data-lucide="zap" class="w-64 h-64"></i>
+                        <i data-lucide="zap" class="w-48 h-48 md:w-64 md:h-64"></i>
                     </div>
                     <div class="relative z-10">
-                        <div class="flex items-center gap-3 mb-3">
-                            <i data-lucide="lightbulb" class="text-yellow-400 w-6 h-6 animate-pulse"></i>
-                            <h4 class="text-xl font-bold text-yellow-400 uppercase tracking-wider text-sm">Pro Tip: El Lenguaje Corporal</h4>
+                        <div class="flex items-center gap-3 mb-3 md:mb-4">
+                            <i data-lucide="lightbulb" class="text-yellow-400 w-6 h-6 animate-pulse shrink-0"></i>
+                            <h4 class="text-lg md:text-xl font-bold text-yellow-400 uppercase tracking-wider text-sm">Pro Tip: El Lenguaje Corporal</h4>
                         </div>
-                        <p class="text-blue-100 leading-relaxed md:text-lg">
+                        <p class="text-blue-100 leading-relaxed text-sm md:text-lg">
                             Cuando digas <strong class="text-white">"Good evening"</strong>, acompáñalo con contacto visual directo al centro del jurado, una sonrisa leve pero segura, y una pausa de <strong class="text-white">1 segundo completo</strong> antes de decir tu nombre. Esa pausa denota poder y control del escenario.
                         </p>
                     </div>
                 </div>
 
-                <div class="mt-12 flex justify-between items-center border-t border-slate-200 pt-6">
-                    <button onclick="goToSection(0)" class="text-slate-400 hover:text-slate-600 font-medium flex items-center gap-2 transition-colors">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Atrás
+                <div class="mt-10 md:mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-slate-200 pt-6">
+                    <button onclick="goToSection(0)" class="w-full sm:w-auto text-slate-400 hover:text-slate-600 font-medium flex items-center justify-center gap-2 transition-colors p-3">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a Inicio
                     </button>
-                    <button onclick="goToSection(2)" class="bg-blue-50 text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-100 hover:shadow-md transition-all flex items-center gap-2">
+                    <button onclick="goToSection(2)" class="w-full sm:w-auto bg-blue-50 text-blue-600 px-6 py-4 sm:py-3 rounded-xl font-bold hover:bg-blue-100 hover:shadow-md transition-all flex items-center justify-center gap-2 active:scale-95">
                         Paso 2: Vocabulario <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -459,33 +506,28 @@
 
             <!-- ================= SECTION 2: Vocabulary ================= -->
             <div id="section-2" class="section-container animate-fade-in hidden">
-                <div class="mb-10 flex flex-col items-start">
+                <div class="mb-8 md:mb-10 flex flex-col items-start">
                     <div class="badge bg-slate-200 text-slate-600 mb-3">Fase 2 de 6</div>
-                    <h1 class="text-4xl md:text-5xl font-bold serif-font text-slate-900">Ambassador Vocabulary</h1>
-                    <p class="text-lg text-slate-500 mt-3 max-w-2xl">Reemplaza palabras comunes por adjetivos de alto calibre. Haz clic en las tarjetas para descubrir su significado, contexto y escuchar su pronunciación.</p>
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold serif-font text-slate-900">Ambassador Vocabulary</h1>
+                    <p class="text-base md:text-lg text-slate-500 mt-3 max-w-2xl">Reemplaza palabras comunes por adjetivos de alto calibre. Toca las tarjetas para girarlas y descubrir su contexto.</p>
                 </div>
 
-                <!-- Instructor Note -->
-                <div class="teacher-note hidden mb-10 p-6 border-2 border-blue-300 bg-blue-50 rounded-2xl flex gap-4 text-blue-900 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
-                    <i data-lucide="book-open-check" class="shrink-0 text-blue-600 mt-1 w-6 h-6"></i>
-                    <div>
-                        <h4 class="font-bold text-blue-800 mb-2 text-lg uppercase tracking-wider text-xs">Instrucción para el Coach</h4>
-                        <p class="text-sm leading-relaxed mb-2">No lo abrumes intentando que memorice las 12 palabras hoy. Pídele que elija **solo 3** que resuenen con su personalidad real. </p>
-                        <p class="text-sm leading-relaxed font-semibold">Ejercicio rápido: Dile: <span class="font-normal italic">"Haz clic en el botón de audio de tu palabra favorita, cierra los ojos, y repítela 3 veces tratando de imitar la melodía exacta".</span></p>
-                    </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start gap-3">
+                    <i data-lucide="info" class="text-blue-500 w-5 h-5 shrink-0 mt-0.5"></i>
+                    <p class="text-sm text-blue-800">Selecciona visualmente <strong>3 adjetivos</strong> que resuenen genuinamente con tu personalidad. Reproduce su audio e intenta imitar la melodía y acentuación.</p>
                 </div>
 
-                <!-- Vocabulary Grid (Generated dynamically via JS to handle 12 robust cards) -->
-                <div id="vocab-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
+                <!-- Vocabulary Grid (Generated dynamically via JS to handle cards) -->
+                <!-- Mobile: 1 col, Tablet: 2 cols, Desktop: 3 cols -->
+                <div id="vocab-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 perspective-1000">
                     <!-- Javascript will inject cards here -->
                 </div>
 
-                <div class="mt-12 flex justify-between items-center border-t border-slate-200 pt-6">
-                    <button onclick="goToSection(1)" class="text-slate-400 hover:text-slate-600 font-medium flex items-center gap-2 transition-colors">
+                <div class="mt-10 md:mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-slate-200 pt-6">
+                    <button onclick="goToSection(1)" class="w-full sm:w-auto text-slate-400 hover:text-slate-600 font-medium flex items-center justify-center gap-2 transition-colors p-3">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Atrás
                     </button>
-                    <button onclick="goToSection(3)" class="bg-blue-50 text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-100 hover:shadow-md transition-all flex items-center gap-2">
+                    <button onclick="goToSection(3)" class="w-full sm:w-auto bg-blue-50 text-blue-600 px-6 py-4 sm:py-3 rounded-xl font-bold hover:bg-blue-100 hover:shadow-md transition-all flex items-center justify-center gap-2 active:scale-95">
                         Paso 3: Gramática Base <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -493,135 +535,126 @@
 
             <!-- ================= SECTION 3: Grammar ================= -->
             <div id="section-3" class="section-container animate-fade-in hidden">
-                <div class="mb-10 flex flex-col items-start">
+                <div class="mb-8 md:mb-10 flex flex-col items-start">
                     <div class="badge bg-slate-200 text-slate-600 mb-3">Fase 3 de 6</div>
-                    <h1 class="text-4xl md:text-5xl font-bold serif-font text-slate-900">Speech Grammar</h1>
-                    <p class="text-lg text-slate-500 mt-3 max-w-2xl">Dominar la diferencia entre "ser" y "hacer" en inglés evitará el 90% de los errores en tus entrevistas.</p>
-                </div>
-
-                <!-- Instructor Note -->
-                <div class="teacher-note hidden mb-10 p-6 border-2 border-blue-300 bg-blue-50 rounded-2xl flex gap-4 text-blue-900 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
-                    <i data-lucide="book-open-check" class="shrink-0 text-blue-600 mt-1 w-6 h-6"></i>
-                    <div>
-                        <h4 class="font-bold text-blue-800 mb-2 text-lg uppercase tracking-wider text-xs">Instrucción para el Coach</h4>
-                        <p class="text-sm leading-relaxed mb-2">Este es el paso más técnico. Asegúrate de corregir el clásico error latino: **"I have 25 years"**. Haz que repita la regla: <span class="italic font-bold">"En inglés soy mis años, no los tengo"</span>.</p>
-                        <p class="text-sm leading-relaxed">Reproduce los audios de los ejemplos para que note la contracción "I'm" versus "I am" (para discursos formales preferimos I am sin contraer).</p>
-                    </div>
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold serif-font text-slate-900">Speech Grammar</h1>
+                    <p class="text-base md:text-lg text-slate-500 mt-3 max-w-2xl">Dominar la diferencia entre "ser" y "hacer" en inglés evitará el 90% de los errores gramaticales en tus entrevistas bajo presión.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <!-- To Be Card -->
-                    <div class="bg-white p-8 md:p-10 rounded-3xl border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.04)] relative overflow-hidden glow-hover">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100 to-transparent rounded-bl-[100px] -z-10"></div>
+                    <div class="bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.04)] relative overflow-hidden glow-hover">
+                        <!-- BG Decoration -->
+                        <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-gradient-to-bl from-blue-100 to-transparent rounded-bl-[100px] -z-10"></div>
                         
-                        <div class="flex justify-between items-start mb-6">
-                            <h3 class="text-3xl font-bold text-blue-700 serif-font flex items-center gap-3">
-                                <i data-lucide="user" class="w-8 h-8 p-1.5 bg-blue-100 rounded-lg text-blue-600"></i> Verb "To Be"
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-6">
+                            <h3 class="text-2xl md:text-3xl font-bold text-blue-700 serif-font flex items-center gap-3">
+                                <i data-lucide="user" class="w-8 h-8 p-1.5 bg-blue-100 rounded-lg text-blue-600 shrink-0"></i> Verb "To Be"
                             </h3>
-                            <div class="badge bg-blue-50 text-blue-600 border border-blue-100">Ser / Estar</div>
+                            <div class="badge bg-blue-50 text-blue-600 border border-blue-100 self-start">Ser / Estar</div>
                         </div>
                         
-                        <p class="text-slate-600 text-[15px] mb-8 font-medium leading-relaxed">Úsalo exclusivamente para definir <strong>tu identidad, tus emociones, características y tu edad</strong>.</p>
+                        <p class="text-slate-600 text-sm md:text-[15px] mb-6 md:mb-8 font-medium leading-relaxed">Úsalo exclusivamente para definir <strong>tu identidad, tus emociones, características físicas y tu edad</strong>.</p>
                         
                         <div class="space-y-4">
                             <!-- Rule 1 -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-blue-600 text-white font-bold py-1.5 px-3 rounded-lg text-sm shadow-md">I am</span>
-                                    <span class="text-slate-800 font-semibold text-lg">Roberto. <span class="text-slate-400 text-sm font-normal block md:inline">(Identidad)</span></span>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group active:bg-slate-100 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                    <span class="bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs md:text-sm shadow-md self-start sm:self-auto">I am</span>
+                                    <span class="text-slate-800 font-semibold text-base md:text-lg leading-tight">Roberto. <span class="text-slate-400 text-xs md:text-sm font-normal block sm:inline mt-1 sm:mt-0">(Identidad)</span></span>
                                 </div>
-                                <button onclick="speakText('I am Roberto')" class="text-slate-400 hover:text-blue-600 p-2"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
+                                <button onclick="speakText('I am Roberto')" class="text-slate-400 hover:text-blue-600 p-2 shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
                             </div>
                             <!-- Rule 2 -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-blue-600 text-white font-bold py-1.5 px-3 rounded-lg text-sm shadow-md">I am</span>
-                                    <span class="text-slate-800 font-semibold text-lg">25 years old. <span class="text-slate-400 text-sm font-normal block md:inline">(Edad)</span></span>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group active:bg-slate-100 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                    <span class="bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs md:text-sm shadow-md self-start sm:self-auto">I am</span>
+                                    <span class="text-slate-800 font-semibold text-base md:text-lg leading-tight">25 years old. <span class="text-slate-400 text-xs md:text-sm font-normal block sm:inline mt-1 sm:mt-0">(Edad)</span></span>
                                 </div>
-                                <button onclick="speakText('I am 25 years old')" class="text-slate-400 hover:text-blue-600 p-2"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
+                                <button onclick="speakText('I am 25 years old')" class="text-slate-400 hover:text-blue-600 p-2 shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
                             </div>
                             <!-- Rule 3 -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-blue-600 text-white font-bold py-1.5 px-3 rounded-lg text-sm shadow-md">I am</span>
-                                    <span class="text-slate-800 font-semibold text-lg">grateful. <span class="text-slate-400 text-sm font-normal block md:inline">(Estado emocional)</span></span>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group active:bg-slate-100 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                    <span class="bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs md:text-sm shadow-md self-start sm:self-auto">I am</span>
+                                    <span class="text-slate-800 font-semibold text-base md:text-lg leading-tight">grateful. <span class="text-slate-400 text-xs md:text-sm font-normal block sm:inline mt-1 sm:mt-0">(Estado)</span></span>
                                 </div>
-                                <button onclick="speakText('I am grateful')" class="text-slate-400 hover:text-blue-600 p-2"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
+                                <button onclick="speakText('I am grateful')" class="text-slate-400 hover:text-blue-600 p-2 shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
                             </div>
                         </div>
 
                         <!-- Critical Error Alert -->
-                        <div class="mt-8 bg-red-50 border-l-4 border-red-500 p-5 rounded-r-xl flex items-start gap-4">
+                        <div class="mt-8 bg-red-50 border-l-4 border-red-500 p-4 md:p-5 rounded-r-xl flex flex-col sm:flex-row items-start gap-3 md:gap-4">
                             <div class="bg-red-100 p-2 rounded-full shrink-0">
                                 <i data-lucide="siren" class="text-red-600 w-5 h-5 animate-pulse"></i>
                             </div>
                             <div>
-                                <h5 class="text-red-800 font-bold mb-1">El error #1 de los latinos</h5>
-                                <p class="text-red-700 text-sm leading-relaxed">La edad <strong>NO</strong> se tiene, la edad se <strong>ES</strong>. Borra de tu mente la frase <span class="line-through font-bold opacity-70">"I have 25 years"</span>. Es el error que más penalizan los jurados internacionales.</p>
+                                <h5 class="text-red-800 font-bold mb-1 text-sm md:text-base">El error #1 de los latinos</h5>
+                                <p class="text-red-700 text-xs md:text-sm leading-relaxed">La edad <strong>NO</strong> se tiene, la edad se <strong>ES</strong>. Borra de tu mente la frase <span class="line-through font-bold opacity-70">"I have 25 years"</span>. Es el error que más penalizan los jurados.</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Present Simple Card -->
-                    <div class="bg-white p-8 md:p-10 rounded-3xl border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.04)] relative overflow-hidden glow-hover">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-100 to-transparent rounded-bl-[100px] -z-10"></div>
+                    <div class="bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.04)] relative overflow-hidden glow-hover">
+                        <!-- BG Decoration -->
+                        <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-gradient-to-bl from-indigo-100 to-transparent rounded-bl-[100px] -z-10"></div>
                         
-                        <div class="flex justify-between items-start mb-6">
-                            <h3 class="text-3xl font-bold text-slate-800 serif-font flex items-center gap-3">
-                                <i data-lucide="zap" class="w-8 h-8 p-1.5 bg-slate-100 rounded-lg text-slate-600"></i> Action Verbs
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-6">
+                            <h3 class="text-2xl md:text-3xl font-bold text-slate-800 serif-font flex items-center gap-3">
+                                <i data-lucide="zap" class="w-8 h-8 p-1.5 bg-slate-100 rounded-lg text-slate-600 shrink-0"></i> Action Verbs
                             </h3>
-                            <div class="badge bg-slate-100 text-slate-600 border border-slate-200">Hacer / Accionar</div>
+                            <div class="badge bg-slate-100 text-slate-600 border border-slate-200 self-start">Hacer / Accionar</div>
                         </div>
                         
-                        <p class="text-slate-600 text-[15px] mb-8 font-medium leading-relaxed">Úsalo para hablar de <strong>verdades absolutas, acciones, hábitos o tus misiones</strong>.</p>
+                        <p class="text-slate-600 text-sm md:text-[15px] mb-6 md:mb-8 font-medium leading-relaxed">Úsalo para hablar de <strong>verdades absolutas, acciones reales, hábitos o tus misiones</strong>.</p>
                         
                         <div class="space-y-4">
                             <!-- Rule 1 -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-slate-800 text-white font-bold py-1.5 px-3 rounded-lg text-sm shadow-md">I represent</span>
-                                    <span class="text-slate-800 font-semibold text-lg">Mexico. <span class="text-slate-400 text-sm font-normal block md:inline">(Acción continua)</span></span>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group active:bg-slate-100 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                    <span class="bg-slate-800 text-white font-bold py-1 px-3 rounded-lg text-xs md:text-sm shadow-md self-start sm:self-auto">I represent</span>
+                                    <span class="text-slate-800 font-semibold text-base md:text-lg leading-tight">Mexico. <span class="text-slate-400 text-xs md:text-sm font-normal block sm:inline mt-1 sm:mt-0">(Acción)</span></span>
                                 </div>
-                                <button onclick="speakText('I represent Mexico')" class="text-slate-400 hover:text-blue-600 p-2"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
+                                <button onclick="speakText('I represent Mexico')" class="text-slate-400 hover:text-blue-600 p-2 shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
                             </div>
                             <!-- Rule 2 -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-slate-800 text-white font-bold py-1.5 px-3 rounded-lg text-sm shadow-md">I believe</span>
-                                    <span class="text-slate-800 font-semibold text-lg">in education. <span class="text-slate-400 text-sm font-normal block md:inline">(Filosofía/Verdad)</span></span>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group active:bg-slate-100 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                    <span class="bg-slate-800 text-white font-bold py-1 px-3 rounded-lg text-xs md:text-sm shadow-md self-start sm:self-auto">I believe</span>
+                                    <span class="text-slate-800 font-semibold text-base md:text-lg leading-tight">in education. <span class="text-slate-400 text-xs md:text-sm font-normal block sm:inline mt-1 sm:mt-0">(Filosofía)</span></span>
                                 </div>
-                                <button onclick="speakText('I believe in education')" class="text-slate-400 hover:text-blue-600 p-2"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
+                                <button onclick="speakText('I believe in education')" class="text-slate-400 hover:text-blue-600 p-2 shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
                             </div>
                             <!-- Rule 3 -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-slate-800 text-white font-bold py-1.5 px-3 rounded-lg text-sm shadow-md">I work</span>
-                                    <span class="text-slate-800 font-semibold text-lg">with youth. <span class="text-slate-400 text-sm font-normal block md:inline">(Hábito/Ocupación)</span></span>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group active:bg-slate-100 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                    <span class="bg-slate-800 text-white font-bold py-1 px-3 rounded-lg text-xs md:text-sm shadow-md self-start sm:self-auto">I work</span>
+                                    <span class="text-slate-800 font-semibold text-base md:text-lg leading-tight">with youth. <span class="text-slate-400 text-xs md:text-sm font-normal block sm:inline mt-1 sm:mt-0">(Hábito)</span></span>
                                 </div>
-                                <button onclick="speakText('I work with youth')" class="text-slate-400 hover:text-blue-600 p-2"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
+                                <button onclick="speakText('I work with youth')" class="text-slate-400 hover:text-blue-600 p-2 shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
                             </div>
                         </div>
                         
                         <!-- Diction Tip -->
-                        <div class="mt-8 bg-gradient-to-r from-slate-800 to-slate-700 p-5 rounded-xl text-white flex items-start gap-4 shadow-lg">
+                        <div class="mt-8 bg-gradient-to-r from-slate-800 to-slate-700 p-4 md:p-5 rounded-xl text-white flex flex-col sm:flex-row items-start gap-3 md:gap-4 shadow-lg">
                             <div class="bg-yellow-400/20 p-2 rounded-full shrink-0">
                                 <i data-lucide="mic-2" class="text-yellow-400 w-5 h-5"></i>
                             </div>
                             <div>
-                                <h5 class="text-yellow-400 font-bold mb-1">Tip de Dicción</h5>
-                                <p class="text-slate-200 text-sm leading-relaxed">Pronuncia la consonante final fuerte. La <strong>"T"</strong> en <em>represen<strong>t</strong></em> o la <strong>"K"</strong> en <em>wor<strong>k</strong></em>. Esa pequeña explosión de aire denota autoridad y excelente dicción.</p>
+                                <h5 class="text-yellow-400 font-bold mb-1 text-sm md:text-base">Tip de Dicción Premium</h5>
+                                <p class="text-slate-200 text-xs md:text-sm leading-relaxed">Pronuncia la consonante final fuerte. La <strong>"T"</strong> en <em>represen<strong>t</strong></em> o la <strong>"K"</strong> en <em>wor<strong>k</strong></em>. Esa pequeña explosión de aire final denota limpieza vocal y excelente dicción bajo micrófonos de alta fidelidad.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-12 flex justify-between items-center border-t border-slate-200 pt-6">
-                    <button onclick="goToSection(2)" class="text-slate-400 hover:text-slate-600 font-medium flex items-center gap-2 transition-colors">
+                <div class="mt-10 md:mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-slate-200 pt-6">
+                    <button onclick="goToSection(2)" class="w-full sm:w-auto text-slate-400 hover:text-slate-600 font-medium flex items-center justify-center gap-2 transition-colors p-3">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Atrás
                     </button>
-                    <button onclick="goToSection(4)" class="bg-blue-50 text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-100 hover:shadow-md transition-all flex items-center gap-2">
+                    <button onclick="goToSection(4)" class="w-full sm:w-auto bg-blue-50 text-blue-600 px-6 py-4 sm:py-3 rounded-xl font-bold hover:bg-blue-100 hover:shadow-md transition-all flex items-center justify-center gap-2 active:scale-95">
                         Paso 4: Construir Fórmula <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -629,26 +662,15 @@
 
             <!-- ================= SECTION 4: The Formula ================= -->
             <div id="section-4" class="section-container animate-fade-in hidden">
-                <div class="mb-10 flex flex-col items-start">
+                <div class="mb-8 md:mb-10 flex flex-col items-start">
                     <div class="badge bg-slate-200 text-slate-600 mb-3">Fase 4 de 6</div>
-                    <h1 class="text-4xl md:text-5xl font-bold serif-font text-slate-900">The Formula Constructor</h1>
-                    <p class="text-lg text-slate-500 mt-3 max-w-2xl">Llegó el momento de personalizar tu discurso. Llena los campos para generar automáticamente el texto que leerás en el teleprompter.</p>
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold serif-font text-slate-900">The Formula Constructor</h1>
+                    <p class="text-base md:text-lg text-slate-500 mt-3 max-w-2xl">Llegó el momento de personalizar tu discurso. Llena los campos para generar automáticamente el texto que leerás en el teleprompter.</p>
                 </div>
 
-                <!-- Instructor Note -->
-                <div class="teacher-note hidden mb-10 p-6 border-2 border-blue-300 bg-blue-50 rounded-2xl flex gap-4 text-blue-900 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
-                    <i data-lucide="book-open-check" class="shrink-0 text-blue-600 mt-1 w-6 h-6"></i>
-                    <div>
-                        <h4 class="font-bold text-blue-800 mb-2 text-lg uppercase tracking-wider text-xs">Instrucción para el Coach</h4>
-                        <p class="text-sm leading-relaxed mb-2">Aquí tú tomas el control del teclado. Mientras él te dicta sus datos, oblígalo a decirlo en inglés. Si le preguntas la edad y responde "veinticinco", dile "In English, please. I am...?"</p>
-                        <p class="text-sm leading-relaxed">Nota la nueva sección de "Profesión/Causa". Esto eleva el discurso de un nivel básico a un nivel de embajador.</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-10">
                     <!-- Inputs Form -->
-                    <div class="xl:col-span-5 space-y-6 bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/40">
+                    <div class="xl:col-span-5 space-y-6 bg-white p-6 md:p-8 rounded-3xl md:rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/40">
                         <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
                             <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><i data-lucide="sliders" class="w-5 h-5"></i></div>
                             <h3 class="font-bold text-xl text-slate-800">Tus Datos</h3>
@@ -656,9 +678,7 @@
 
                         <div class="space-y-5">
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex justify-between">
-                                    <span>Tu Nombre (Artístico/Real)</span>
-                                </label>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tu Nombre (Artístico/Real)</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                         <i data-lucide="user" class="w-5 h-5"></i>
@@ -667,7 +687,7 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tu Edad</label>
                                     <div class="relative">
@@ -686,7 +706,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Estado Emocional (Adjetivo)</label>
                                 <div class="relative">
-                                    <select id="inp-adj" onchange="updateScript()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all appearance-none">
+                                    <select id="inp-adj" onchange="updateScript()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all appearance-none cursor-pointer">
                                         <option value="proud" selected>Proud (Orgulloso)</option>
                                         <option value="honored">Honored (Honrado)</option>
                                         <option value="ready">Ready (Listo)</option>
@@ -695,20 +715,20 @@
                                         <option value="committed">Committed (Comprometido)</option>
                                         <option value="passionate">Passionate (Apasionado)</option>
                                     </select>
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-500">
+                                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-500">
                                         <i data-lucide="chevron-down" class="w-5 h-5"></i>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tu Profesión / Pasión / Causa</label>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Profesión / Causa Social</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                         <i data-lucide="briefcase" class="w-5 h-5"></i>
                                     </div>
-                                    <input type="text" id="inp-cause" oninput="updateScript()" placeholder="an architect / a fitness coach / an advocate" class="pl-10 w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400 placeholder:font-normal">
-                                    <p class="text-[10px] text-slate-400 mt-1.5 ml-1">Ej: "an architect", "a medical student", "a proud volunteer". Incluye "a" o "an" al inicio.</p>
+                                    <input type="text" id="inp-cause" oninput="updateScript()" placeholder="an architect / a fitness coach" class="pl-10 w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400 placeholder:font-normal">
+                                    <p class="text-[10px] text-slate-400 mt-2 ml-1 leading-tight">Ej: "an architect", "a medical student", "a proud volunteer". Incluye "a" o "an" al inicio. Esto eleva tu discurso al nivel de un embajador integral.</p>
                                 </div>
                             </div>
                         </div>
@@ -716,26 +736,24 @@
 
                     <!-- Live Preview Card -->
                     <div class="xl:col-span-7">
-                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 h-full rounded-[2rem] p-8 md:p-12 shadow-2xl flex flex-col justify-between relative overflow-hidden group">
+                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 h-full rounded-3xl md:rounded-[2rem] p-6 md:p-12 shadow-2xl flex flex-col justify-between relative overflow-hidden group">
                             
                             <!-- Deco -->
-                            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[80px] group-hover:bg-blue-500/30 transition-colors duration-700"></div>
+                            <div class="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-blue-600/20 rounded-full blur-[60px] md:blur-[80px] group-hover:bg-blue-500/30 transition-colors duration-700 pointer-events-none"></div>
                             
-                            <div>
-                                <div class="flex justify-between items-center mb-10 border-b border-slate-700/50 pb-4">
+                            <div class="relative z-10">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 md:mb-10 border-b border-slate-700/50 pb-4">
                                     <h3 class="text-slate-400 font-bold tracking-widest text-xs uppercase flex items-center gap-2">
                                         <i data-lucide="file-text" class="w-4 h-4"></i> Vista Previa del Guion Final
                                     </h3>
-                                    <div class="flex gap-2">
-                                        <button onclick="speakText(document.getElementById('prompter-final-text').innerText)" class="bg-slate-700/50 hover:bg-slate-600 text-white p-2 rounded-lg transition-colors flex items-center gap-2 text-xs font-medium border border-slate-600">
-                                            <i data-lucide="play-circle" class="w-4 h-4"></i> Escuchar Completo
-                                        </button>
-                                    </div>
+                                    <button onclick="speakText(document.getElementById('prompter-final-text').innerText)" class="bg-slate-700/50 hover:bg-slate-600 text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-xs font-medium border border-slate-600 active:bg-slate-500">
+                                        <i data-lucide="play-circle" class="w-4 h-4"></i> Escuchar Audio Completo
+                                    </button>
                                 </div>
                                 
-                                <div class="text-2xl md:text-[28px] leading-[1.8] serif-font text-slate-200 relative z-10 font-light">
-                                    <p class="mb-6 opacity-90 transition-all hover:opacity-100 hover:text-white cursor-default">"Good evening distinguished judges and audience."</p>
-                                    <p class="mb-6 opacity-90 transition-all hover:opacity-100 hover:text-white cursor-default">
+                                <div class="text-xl md:text-2xl lg:text-[28px] leading-[1.7] md:leading-[1.8] serif-font text-slate-200 font-light">
+                                    <p class="mb-5 md:mb-6 opacity-90 transition-all hover:opacity-100 hover:text-white cursor-default">"Good evening distinguished judges and audience."</p>
+                                    <p class="mb-5 md:mb-6 opacity-90 transition-all hover:opacity-100 hover:text-white cursor-default">
                                         "My name is <span id="out-name" class="text-yellow-400 font-bold border-b-2 border-yellow-500/50">_____</span>.<br/>
                                         I am <span id="out-age" class="text-yellow-400 font-bold border-b-2 border-yellow-500/50">___</span> years old, and I am <span id="out-cause" class="text-yellow-400 font-bold border-b-2 border-yellow-500/50">_____</span>."
                                     </p>
@@ -745,8 +763,8 @@
                                 </div>
                             </div>
 
-                            <div class="mt-12 flex justify-end z-10 border-t border-slate-700/50 pt-8">
-                                <button onclick="goToSection(5)" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-3 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] hover:-translate-y-1">
+                            <div class="mt-10 md:mt-12 flex justify-center sm:justify-end z-10 border-t border-slate-700/50 pt-6 md:pt-8">
+                                <button onclick="goToSection(5)" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-6 md:px-8 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] hover:-translate-y-1 active:scale-95">
                                     Ir al Estudio Teleprompter <i data-lucide="monitor-play" class="w-5 h-5"></i>
                                 </button>
                             </div>
@@ -754,75 +772,80 @@
                     </div>
                 </div>
 
-                <div class="mt-12 flex justify-start items-center border-t border-slate-200 pt-6">
-                    <button onclick="goToSection(3)" class="text-slate-400 hover:text-slate-600 font-medium flex items-center gap-2 transition-colors">
+                <div class="mt-10 md:mt-12 flex justify-start items-center border-t border-slate-200 pt-6">
+                    <button onclick="goToSection(3)" class="text-slate-400 hover:text-slate-600 font-medium flex items-center justify-center gap-2 transition-colors p-3">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Atrás a Gramática
                     </button>
                 </div>
             </div>
 
             <!-- ================= SECTION 5: Teleprompter ================= -->
-            <div id="section-5" class="section-container animate-fade-in hidden flex-col h-[85vh]">
-                <div class="mb-6 flex justify-between items-end shrink-0">
+            <div id="section-5" class="section-container animate-fade-in hidden flex-col h-[calc(100vh-100px)] lg:h-[85vh]">
+                <!-- Header & Controls -->
+                <div class="mb-4 md:mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4 shrink-0">
                     <div>
-                        <div class="badge bg-slate-200 text-slate-600 mb-2">Fase 5 de 6</div>
-                        <h1 class="text-3xl font-bold serif-font text-slate-900 flex items-center gap-3">
-                            <i data-lucide="monitor-play" class="text-blue-600 w-8 h-8"></i> Teleprompter Studio
+                        <div class="badge bg-slate-200 text-slate-600 mb-2 hidden md:inline-flex">Fase 5 de 6</div>
+                        <h1 class="text-2xl md:text-3xl font-bold serif-font text-slate-900 flex items-center gap-2 md:gap-3">
+                            <i data-lucide="monitor-play" class="text-blue-600 w-6 h-6 md:w-8 md:h-8"></i> Teleprompter Studio
                         </h1>
                     </div>
                     
-                    <!-- Advanced Controls Container -->
-                    <div class="flex items-center gap-5 bg-white p-3 rounded-2xl border border-slate-200 shadow-md">
-                        <!-- Font Size Control -->
-                        <div class="flex items-center gap-2 px-2 hidden md:flex">
-                            <button onclick="adjustPrompterFont(-1)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><i data-lucide="a-large-small" class="w-4 h-4"></i></button>
-                            <button onclick="adjustPrompterFont(1)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><i data-lucide="type" class="w-5 h-5"></i></button>
+                    <!-- Advanced Controls Container (Responsive layout) -->
+                    <div class="flex flex-wrap md:flex-nowrap items-center gap-3 md:gap-5 bg-white p-3 rounded-2xl border border-slate-200 shadow-md w-full md:w-auto justify-between md:justify-end">
+                        
+                        <!-- Font Size Control (Hidden on very small screens, functional on tablet+) -->
+                        <div class="flex items-center gap-1 md:gap-2 px-1 md:px-2 hidden sm:flex">
+                            <button onclick="adjustPrompterFont(-1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors active:bg-blue-100"><i data-lucide="a-large-small" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+                            <button onclick="adjustPrompterFont(1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors active:bg-blue-100"><i data-lucide="type" class="w-5 h-5 md:w-6 md:h-6"></i></button>
                         </div>
                         
-                        <div class="h-10 w-px bg-slate-200 hidden md:block"></div>
+                        <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
 
                         <!-- Speed Control -->
-                        <div class="flex flex-col px-2 w-32">
-                            <label class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1 flex justify-between">
-                                Velocidad <span id="speed-display" class="text-blue-600 font-mono">2.0x</span>
+                        <div class="flex flex-col px-2 flex-1 sm:flex-none sm:w-32 min-w-[100px]">
+                            <label class="text-[10px] md:text-xs text-slate-500 uppercase font-bold tracking-wider mb-1 flex justify-between items-center">
+                                Velocidad <span id="speed-display" class="text-blue-600 font-mono bg-blue-50 px-1 rounded">2.0x</span>
                             </label>
-                            <input type="range" id="prompter-speed" min="0.5" max="5" step="0.5" value="2" oninput="document.getElementById('speed-display').innerText=this.value+'x'" class="w-full accent-blue-600">
+                            <input type="range" id="prompter-speed" min="0.5" max="5" step="0.5" value="2" oninput="document.getElementById('speed-display').innerText=this.value+'x'" class="w-full accent-blue-600 touch-pan-x">
                         </div>
                         
-                        <div class="h-10 w-px bg-slate-200"></div>
+                        <div class="h-8 md:h-10 w-px bg-slate-200 hidden xs:block"></div>
                         
                         <!-- Playback Controls -->
-                        <div class="flex gap-2">
-                            <button onclick="resetPrompter()" class="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all border border-transparent hover:shadow-inner" title="Reiniciar (Volver al inicio)">
-                                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                        <div class="flex gap-2 shrink-0">
+                            <button onclick="resetPrompter()" class="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all border border-transparent hover:shadow-inner active:scale-95" title="Reiniciar (Volver al inicio)">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5"></i>
                             </button>
-                            <button id="btn-play" onclick="togglePrompter()" class="w-14 h-14 rounded-xl flex items-center justify-center transition-all bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 hover:-translate-y-0.5" title="Reproducir / Pausar">
-                                <i id="icon-play" data-lucide="play" class="w-6 h-6 ml-1"></i>
-                                <i id="icon-pause" data-lucide="pause" class="w-6 h-6 hidden"></i>
+                            <button id="btn-play" onclick="togglePrompter()" class="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 active:scale-95" title="Reproducir / Pausar">
+                                <i id="icon-play" data-lucide="play" class="w-5 h-5 md:w-6 md:h-6 ml-1"></i>
+                                <i id="icon-pause" data-lucide="pause" class="w-5 h-5 md:w-6 md:h-6 hidden"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Instructor Note / Checklist -->
-                <div class="teacher-note hidden mb-6 bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 shrink-0 transition-all shadow-sm">
-                    <h4 class="font-bold text-blue-800 mb-3 flex items-center gap-2"><i data-lucide="check-square" class="w-5 h-5"></i> Checklist de Grabación</h4>
-                    <ul class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <li class="flex items-start gap-2 text-sm text-blue-900"><i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i> Espalda recta, hombros relajados hacia atrás.</li>
-                        <li class="flex items-start gap-2 text-sm text-blue-900"><i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i> Ojos fijos en el lente de la cámara (no en la pantalla).</li>
-                        <li class="flex items-start gap-2 text-sm text-blue-900"><i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i> Medio segundo de pausa y sonrisa al terminar la presentación.</li>
-                    </ul>
+                <!-- Pro Checklist for recording -->
+                <div class="mb-4 bg-white border border-slate-200 rounded-xl p-3 md:p-4 shrink-0 shadow-sm">
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-start sm:items-center">
+                        <span class="text-xs md:text-sm font-bold text-slate-700 flex items-center gap-1.5"><i data-lucide="check-square" class="w-4 h-4 text-emerald-500"></i> Checklist:</span>
+                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] md:text-xs text-slate-600 font-medium">
+                            <span class="flex items-center gap-1"><i data-lucide="circle-dot" class="w-3 h-3 text-slate-400"></i> Ojos fijos en la cámara</span>
+                            <span class="flex items-center gap-1"><i data-lucide="circle-dot" class="w-3 h-3 text-slate-400"></i> Hombros atrás</span>
+                            <span class="flex items-center gap-1"><i data-lucide="circle-dot" class="w-3 h-3 text-slate-400"></i> Pausa al terminar</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- The Teleprompter Box -->
-                <div class="flex-1 relative rounded-[2rem] overflow-hidden bg-black border-[6px] border-slate-800 shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] glow-hover">
+                <div class="flex-1 relative rounded-3xl md:rounded-[2rem] overflow-hidden bg-black border-[4px] md:border-[6px] border-slate-800 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] glow-hover touch-none">
+                    
                     <!-- Recording UI Overlay -->
-                    <div class="absolute top-6 left-6 z-20 flex items-center gap-3 bg-black/70 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                        <div class="relative flex h-3 w-3">
+                    <div class="absolute top-4 left-4 md:top-6 md:left-6 z-20 flex items-center gap-2 md:gap-3 bg-black/70 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/10">
+                        <div class="relative flex h-2 w-2 md:h-3 md:w-3">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 md:h-3 md:w-3 bg-red-500"></span>
                         </div>
-                        <span class="text-white text-sm font-bold tracking-widest font-mono uppercase">Live REC</span>
+                        <span class="text-white text-xs md:text-sm font-bold tracking-widest font-mono uppercase">Live REC</span>
                     </div>
 
                     <!-- Rule of Thirds Grid (Subtle) -->
@@ -836,18 +859,18 @@
                     </div>
 
                     <!-- Fade overlays for text effect -->
-                    <div class="absolute top-0 left-0 w-full h-[30%] bg-gradient-to-b from-black via-black/80 to-transparent z-20 pointer-events-none"></div>
-                    <div class="absolute bottom-0 left-0 w-full h-[30%] bg-gradient-to-t from-black via-black/80 to-transparent z-20 pointer-events-none"></div>
+                    <div class="absolute top-0 left-0 w-full h-[25%] md:h-[30%] bg-gradient-to-b from-black via-black/80 to-transparent z-20 pointer-events-none"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-[25%] md:h-[30%] bg-gradient-to-t from-black via-black/80 to-transparent z-20 pointer-events-none"></div>
                     
                     <!-- Central Reading Line Target -->
-                    <div id="reading-line" class="absolute top-1/2 left-0 w-full h-24 -translate-y-1/2 bg-yellow-500/10 border-y-2 border-yellow-500/40 z-10 pointer-events-none flex items-center justify-between px-0 transition-opacity opacity-50">
-                        <div class="w-0 h-0 border-t-[12px] border-t-transparent border-l-[20px] border-l-yellow-500 border-b-[12px] border-b-transparent filter drop-shadow-[0_0_5px_rgba(234,179,8,0.8)]"></div>
-                        <div class="w-0 h-0 border-t-[12px] border-t-transparent border-r-[20px] border-r-yellow-500 border-b-[12px] border-b-transparent filter drop-shadow-[0_0_5px_rgba(234,179,8,0.8)]"></div>
+                    <div id="reading-line" class="absolute top-1/2 left-0 w-full h-16 md:h-24 -translate-y-1/2 bg-yellow-500/10 border-y-2 border-yellow-500/40 z-10 pointer-events-none flex items-center justify-between px-0 transition-opacity opacity-50">
+                        <div class="w-0 h-0 border-t-[8px] md:border-t-[12px] border-t-transparent border-l-[12px] md:border-l-[20px] border-l-yellow-500 border-b-[8px] md:border-b-[12px] border-b-transparent filter drop-shadow-[0_0_5px_rgba(234,179,8,0.8)]"></div>
+                        <div class="w-0 h-0 border-t-[8px] md:border-t-[12px] border-t-transparent border-r-[12px] md:border-r-[20px] border-r-yellow-500 border-b-[8px] md:border-b-[12px] border-b-transparent filter drop-shadow-[0_0_5px_rgba(234,179,8,0.8)]"></div>
                     </div>
 
                     <!-- The Scrolling Text -->
-                    <div id="prompter-scroll" class="w-full h-full overflow-y-auto pt-[45vh] pb-[45vh] px-10 md:px-32 text-center hide-scrollbar" style="scroll-behavior: smooth;">
-                        <p id="prompter-final-text" class="text-[40px] md:text-[50px] lg:text-[64px] text-white font-bold leading-[1.6] whitespace-pre-wrap serif-font uppercase tracking-wide text-shadow-lg transition-all duration-300">
+                    <div id="prompter-scroll" class="w-full h-full overflow-y-auto pt-[40vh] pb-[45vh] px-4 sm:px-10 md:px-24 lg:px-32 text-center hide-scrollbar" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                        <p id="prompter-final-text" class="text-[28px] sm:text-[36px] md:text-[50px] lg:text-[60px] text-white font-bold leading-[1.5] md:leading-[1.6] whitespace-pre-wrap serif-font uppercase tracking-wide text-shadow-lg transition-all duration-300 break-words">
 GOOD EVENING DISTINGUISHED JUDGES AND AUDIENCE.
 
 MY NAME IS [YOUR NAME].
@@ -858,11 +881,11 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
                     </div>
                 </div>
 
-                <div class="mt-8 flex justify-between items-center shrink-0">
-                    <button onclick="goToSection(4)" class="text-slate-400 hover:text-slate-600 font-medium flex items-center gap-2 transition-colors">
+                <div class="mt-6 md:mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
+                    <button onclick="goToSection(4)" class="w-full sm:w-auto text-slate-400 hover:text-slate-600 font-medium flex items-center justify-center gap-2 transition-colors p-3">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Editar Guion
                     </button>
-                    <button onclick="goToSection(6)" class="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-3 shadow-[0_5px_15px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_20px_rgba(37,99,235,0.5)] hover:-translate-y-1">
+                    <button onclick="goToSection(6)" class="w-full sm:w-auto bg-blue-600 text-white px-6 md:px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-3 shadow-[0_5px_15px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_20px_rgba(37,99,235,0.5)] active:scale-95 md:hover:-translate-y-1">
                         Evaluar Desempeño Final <i data-lucide="award" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -870,72 +893,72 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
 
             <!-- ================= SECTION 6: Evaluation ================= -->
             <div id="section-6" class="section-container animate-fade-in hidden pb-20">
-                <div class="mb-12 text-center max-w-2xl mx-auto">
+                <div class="mb-10 md:mb-12 text-center max-w-2xl mx-auto">
                     <div class="badge bg-slate-200 text-slate-600 mb-4">Fase 6 de 6</div>
-                    <div class="w-20 h-20 mx-auto bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 border border-blue-100 shadow-lg rotate-3">
-                        <i data-lucide="clipboard-check" class="w-10 h-10 -rotate-3"></i>
+                    <div class="w-16 h-16 md:w-20 md:h-20 mx-auto bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4 md:mb-6 border border-blue-100 shadow-lg rotate-3">
+                        <i data-lucide="clipboard-check" class="w-8 h-8 md:w-10 md:h-10 -rotate-3"></i>
                     </div>
-                    <h1 class="text-4xl md:text-5xl font-bold serif-font text-slate-900">Evaluación del Coach</h1>
-                    <p class="text-lg text-slate-500 mt-4">La retroalimentación honesta y estructurada es el desayuno de los campeones. Califica los siguientes 4 pilares.</p>
+                    <h1 class="text-3xl md:text-5xl font-bold serif-font text-slate-900">Autoevaluación</h1>
+                    <p class="text-base md:text-lg text-slate-500 mt-3 md:mt-4">La retroalimentación honesta y estructurada es el desayuno de los campeones. Califica sinceramente tu desempeño en cámara.</p>
                 </div>
 
-                <div class="bg-white rounded-[2.5rem] p-8 md:p-14 max-w-4xl mx-auto border border-slate-200 shadow-2xl relative overflow-hidden">
+                <div class="bg-white rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 lg:p-14 max-w-4xl mx-auto border border-slate-200 shadow-2xl relative overflow-hidden">
                     <!-- Top border accent -->
-                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600"></div>
+                    <div class="absolute top-0 left-0 w-full h-2 md:h-3 bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600"></div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 mb-14">
-                        <!-- Score Sliders -->
-                        <div class="space-y-4 group">
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="text-[15px] font-bold text-slate-800 flex items-center gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 mb-12 md:mb-14">
+                        <!-- Score Sliders (Mobile optimized touch targets) -->
+                        <div class="space-y-3 md:space-y-4 group">
+                            <div class="flex justify-between items-end mb-1 md:mb-2">
+                                <label class="text-sm md:text-[15px] font-bold text-slate-800 flex items-center gap-2">
                                     <div class="p-1.5 bg-blue-50 rounded text-blue-600"><i data-lucide="camera" class="w-4 h-4"></i></div>
                                     Postura y Mirada
                                 </label>
-                                <span id="val-1" class="text-blue-700 font-extrabold text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-16 text-center">50%</span>
+                                <span id="val-1" class="text-blue-700 font-extrabold text-base md:text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-14 md:w-16 text-center">50%</span>
                             </div>
                             <input type="range" class="eval-slider" min="0" max="100" value="50" oninput="updateEval()">
-                            <p class="text-xs text-slate-400 mt-1 italic">Mantuvo la espalda recta y no bajó la mirada al terminar.</p>
+                            <p class="text-[11px] md:text-xs text-slate-400 mt-1 italic">¿Mantuve la espalda recta y no bajé la mirada al terminar?</p>
                         </div>
                         
-                        <div class="space-y-4 group">
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="text-[15px] font-bold text-slate-800 flex items-center gap-2">
+                        <div class="space-y-3 md:space-y-4 group">
+                            <div class="flex justify-between items-end mb-1 md:mb-2">
+                                <label class="text-sm md:text-[15px] font-bold text-slate-800 flex items-center gap-2">
                                     <div class="p-1.5 bg-blue-50 rounded text-blue-600"><i data-lucide="volume-2" class="w-4 h-4"></i></div>
                                     Volumen y Pausas
                                 </label>
-                                <span id="val-2" class="text-blue-700 font-extrabold text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-16 text-center">50%</span>
+                                <span id="val-2" class="text-blue-700 font-extrabold text-base md:text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-14 md:w-16 text-center">50%</span>
                             </div>
                             <input type="range" class="eval-slider" min="0" max="100" value="50" oninput="updateEval()">
-                            <p class="text-xs text-slate-400 mt-1 italic">Proyectó la voz sin gritar y respetó las pausas de los puntos.</p>
+                            <p class="text-[11px] md:text-xs text-slate-400 mt-1 italic">¿Proyecté la voz sin gritar y respeté las pausas de los puntos?</p>
                         </div>
                         
-                        <div class="space-y-4 group">
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="text-[15px] font-bold text-slate-800 flex items-center gap-2">
+                        <div class="space-y-3 md:space-y-4 group">
+                            <div class="flex justify-between items-end mb-1 md:mb-2">
+                                <label class="text-sm md:text-[15px] font-bold text-slate-800 flex items-center gap-2">
                                     <div class="p-1.5 bg-blue-50 rounded text-blue-600"><i data-lucide="mic" class="w-4 h-4"></i></div>
                                     Pronunciación y Dicción
                                 </label>
-                                <span id="val-3" class="text-blue-700 font-extrabold text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-16 text-center">50%</span>
+                                <span id="val-3" class="text-blue-700 font-extrabold text-base md:text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-14 md:w-16 text-center">50%</span>
                             </div>
                             <input type="range" class="eval-slider" min="0" max="100" value="50" oninput="updateEval()">
-                            <p class="text-xs text-slate-400 mt-1 italic">Las consonantes finales fueron claras, sin acento excesivamente marcado.</p>
+                            <p class="text-[11px] md:text-xs text-slate-400 mt-1 italic">¿Las consonantes finales fueron claras, sin acento hispano excesivo?</p>
                         </div>
                         
-                        <div class="space-y-4 group">
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="text-[15px] font-bold text-slate-800 flex items-center gap-2">
+                        <div class="space-y-3 md:space-y-4 group">
+                            <div class="flex justify-between items-end mb-1 md:mb-2">
+                                <label class="text-sm md:text-[15px] font-bold text-slate-800 flex items-center gap-2">
                                     <div class="p-1.5 bg-blue-50 rounded text-blue-600"><i data-lucide="flame" class="w-4 h-4"></i></div>
                                     Convicción Escénica
                                 </label>
-                                <span id="val-4" class="text-blue-700 font-extrabold text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-16 text-center">50%</span>
+                                <span id="val-4" class="text-blue-700 font-extrabold text-base md:text-lg bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg w-14 md:w-16 text-center">50%</span>
                             </div>
                             <input type="range" class="eval-slider" min="0" max="100" value="50" oninput="updateEval()">
-                            <p class="text-xs text-slate-400 mt-1 italic">Se creyó el personaje de embajador. Proyectó energía y carisma.</p>
+                            <p class="text-[11px] md:text-xs text-slate-400 mt-1 italic">¿Me creí el rol de embajador cultural? ¿Proyecté seguridad genuina?</p>
                         </div>
                     </div>
 
                     <!-- Final Score Dashboard -->
-                    <div class="bg-slate-900 rounded-3xl p-10 mb-12 text-center relative overflow-hidden shadow-xl">
+                    <div class="bg-slate-900 rounded-[2rem] p-8 md:p-10 mb-10 md:mb-12 text-center relative overflow-hidden shadow-xl">
                         <!-- Abstract background lines -->
                         <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
                             <pattern id="pattern-lines" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -945,50 +968,50 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
                         </svg>
 
                         <div class="relative z-10">
-                            <h3 class="text-sm font-bold tracking-[0.2em] text-blue-400 uppercase mb-4">Promedio de Impacto</h3>
+                            <h3 class="text-[11px] md:text-sm font-bold tracking-[0.2em] md:tracking-[0.2em] text-blue-400 uppercase mb-3 md:mb-4">Promedio de Impacto</h3>
                             <div class="flex items-center justify-center gap-2">
-                                <div id="final-avg-score" class="text-8xl font-black text-white serif-font tracking-tight text-shadow">50%</div>
+                                <div id="final-avg-score" class="text-6xl md:text-8xl font-black text-white serif-font tracking-tight text-shadow">50%</div>
                             </div>
-                            <p id="eval-feedback-msg" class="text-slate-300 mt-4 font-medium text-lg">Un buen inicio. Hay áreas técnicas por pulir.</p>
+                            <p id="eval-feedback-msg" class="text-slate-300 mt-3 md:mt-4 font-medium text-sm md:text-lg">Un buen inicio. Hay áreas técnicas por pulir.</p>
                         </div>
                     </div>
 
                     <!-- Homework Assignment Block -->
-                    <div class="bg-blue-50/50 border border-blue-200 rounded-2xl p-8 mb-10">
-                        <div class="flex items-center justify-between mb-6">
-                            <h4 class="text-blue-900 font-bold text-xl flex items-center gap-3">
-                                <i data-lucide="calendar-clock" class="w-6 h-6 text-blue-600"></i> Plan de Acción Semanal
+                    <div class="bg-blue-50/50 border border-blue-200 rounded-3xl p-6 md:p-8 mb-8 md:mb-10">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 md:mb-6">
+                            <h4 class="text-blue-900 font-bold text-lg md:text-xl flex items-center gap-2 md:gap-3">
+                                <i data-lucide="calendar-clock" class="w-5 h-5 md:w-6 md:h-6 text-blue-600"></i> Plan de Acción Semanal
                             </h4>
-                            <div class="badge bg-white border border-blue-200 text-blue-600 shadow-sm">1 Hr Diaria</div>
+                            <div class="badge bg-white border border-blue-200 text-blue-600 shadow-sm self-start sm:self-auto">1 Hr Diaria</div>
                         </div>
                         
-                        <ul class="space-y-5">
-                            <li class="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100 glow-hover">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="mic-2" class="w-5 h-5"></i></div>
+                        <ul class="space-y-4 md:space-y-5">
+                            <li class="flex items-start gap-3 md:gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 glow-hover transition-transform">
+                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="mic-2" class="w-4 h-4 md:w-5 md:h-5"></i></div>
                                 <div>
-                                    <strong class="text-slate-900 block text-base mb-1">Diario de Voz (Lunes a Jueves)</strong>
-                                    <span class="text-slate-600 text-sm leading-relaxed">Envía una nota de voz a tu coach leyendo el guion. Ensaya tonos: un día sumamente formal, otro día más sonriente y cálido.</span>
+                                    <strong class="text-slate-900 block text-sm md:text-base mb-1">Diario de Voz (Lunes a Jueves)</strong>
+                                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed block">Graba una nota de voz leyendo el guion. Ensaya tonos: un día sumamente formal, otro día más sonriente y cálido.</span>
                                 </div>
                             </li>
-                            <li class="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100 glow-hover">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="brain" class="w-5 h-5"></i></div>
+                            <li class="flex items-start gap-3 md:gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 glow-hover transition-transform">
+                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="brain" class="w-4 h-4 md:w-5 md:h-5"></i></div>
                                 <div>
-                                    <strong class="text-slate-900 block text-base mb-1">Expansión de Arsenal (Viernes)</strong>
-                                    <span class="text-slate-600 text-sm leading-relaxed">Memoriza los 3 adjetivos que elegiste hoy y escribe en español por qué te identifican. Lo traduciremos la próxima clase.</span>
+                                    <strong class="text-slate-900 block text-sm md:text-base mb-1">Expansión de Arsenal (Viernes)</strong>
+                                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed block">Memoriza los adjetivos que elegiste hoy y escribe en una libreta por qué te identifican.</span>
                                 </div>
                             </li>
-                            <li class="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100 glow-hover">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="camera" class="w-5 h-5"></i></div>
+                            <li class="flex items-start gap-3 md:gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 glow-hover transition-transform">
+                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="camera" class="w-4 h-4 md:w-5 md:h-5"></i></div>
                                 <div>
-                                    <strong class="text-slate-900 block text-base mb-1">Reto del Espejo (Sábado y Domingo)</strong>
-                                    <span class="text-slate-600 text-sm leading-relaxed">Párate derecho frente al espejo, mírate a los ojos fijamente y lee el guion sin desviar la mirada. Trabaja la seguridad visual.</span>
+                                    <strong class="text-slate-900 block text-sm md:text-base mb-1">Reto del Espejo (Fin de semana)</strong>
+                                    <span class="text-slate-600 text-xs md:text-sm leading-relaxed block">Párate derecho frente al espejo, mírate a los ojos fijamente y lee el guion sin desviar la mirada. Trabaja la seguridad visual.</span>
                                 </div>
                             </li>
                         </ul>
                     </div>
 
-                    <button onclick="triggerCelebration()" class="w-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-bold text-xl py-5 rounded-2xl hover:from-blue-800 hover:to-blue-600 transition-all flex items-center justify-center gap-3 shadow-[0_10px_25px_rgba(37,99,235,0.4)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.6)] transform hover:-translate-y-1">
-                        <i data-lucide="award" class="w-6 h-6"></i> Cerrar y Celebrar Sesión
+                    <button onclick="triggerCelebration()" class="w-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-bold text-lg md:text-xl py-4 md:py-5 rounded-2xl hover:from-blue-800 hover:to-blue-600 transition-all flex items-center justify-center gap-3 shadow-[0_10px_25px_rgba(37,99,235,0.4)] active:scale-95 transform md:hover:-translate-y-1">
+                        <i data-lucide="award" class="w-5 h-5 md:w-6 md:h-6"></i> Completar Masterclass
                     </button>
                 </div>
             </div>
@@ -996,26 +1019,28 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
         </div>
     </main>
 
-    <!-- Vanilla Javascript Logic -->
+    <!-- ==========================================
+         JAVASCRIPT LOGIC (Optimized & Error-Free)
+         ========================================== -->
     <script>
         // ==========================================
-        // DATA ARRAYS (EXPANDED)
+        // DATA ARRAYS (Comprehensive)
         // ==========================================
         
         // 12 Advanced Adjectives for Ambassadors
         const ADJECTIVES = [
-            { id: 1, word: 'Proud', phonetic: '/praʊd/', spa: 'Orgulloso', example: 'I am proud to share our heritage.', tip: 'El adjetivo más clásico y seguro.' },
-            { id: 2, word: 'Honored', phonetic: '/ˈɒn.ərd/', spa: 'Honrado', example: 'I am honored to represent my people.', tip: 'La "H" es muda. Suena como "Onord".' },
+            { id: 1, word: 'Proud', phonetic: '/praʊd/', spa: 'Orgulloso', example: 'I am proud to share our heritage.', tip: 'El adjetivo más clásico y seguro para iniciar.' },
+            { id: 2, word: 'Honored', phonetic: '/ˈɒn.ərd/', spa: 'Honrado', example: 'I am honored to represent my people.', tip: 'La "H" es muda. Suena suave como "Onord".' },
             { id: 3, word: 'Determined', phonetic: '/dɪˈtɜː.mɪnd/', spa: 'Decidido / Determinado', example: 'I am determined to inspire youth.', tip: 'Perfecto para perfiles con historias de superación.' },
-            { id: 4, word: 'Grateful', phonetic: '/ˈɡreɪt.fəl/', spa: 'Agradecido', example: 'I am grateful for this global platform.', tip: 'Denota humildad, muy bien visto por el jurado.' },
+            { id: 4, word: 'Grateful', phonetic: '/ˈɡreɪt.fəl/', spa: 'Agradecido', example: 'I am grateful for this global platform.', tip: 'Denota profunda humildad, muy bien visto.' },
             { id: 5, word: 'Resilient', phonetic: '/rɪˈzɪl.jənt/', spa: 'Resiliente', example: 'Mexican men are strong and resilient.', tip: 'Una palabra de muy alto nivel intelectual.' },
-            { id: 6, word: 'Passionate', phonetic: '/ˈpæʃ.ən.ət/', spa: 'Apasionado', example: 'I am passionate about my culture.', tip: 'Pronuncia la T final clara.' },
-            { id: 7, word: 'Committed', phonetic: '/kəˈmɪt.ɪd/', spa: 'Comprometido', example: 'I am committed to social change.', tip: 'Úsalo si tienes un proyecto social sólido.' },
+            { id: 6, word: 'Passionate', phonetic: '/ˈpæʃ.ən.ət/', spa: 'Apasionado', example: 'I am passionate about my culture.', tip: 'Asegúrate de pronunciar la T final muy clara.' },
+            { id: 7, word: 'Committed', phonetic: '/kəˈmɪt.ɪd/', spa: 'Comprometido', example: 'I am committed to social change.', tip: 'Úsalo si tienes un proyecto social sólido y real.' },
             { id: 8, word: 'Authentic', phonetic: '/ɔːˈθen.tɪk/', spa: 'Auténtico', example: 'I remain authentic to my roots.', tip: 'La "th" suena poniendo la lengua entre los dientes.' },
-            { id: 9, word: 'Visionary', phonetic: '/ˈvɪʒ.ən.ər.i/', spa: 'Visionario', example: 'I am a visionary for a better tomorrow.', tip: 'Para perfiles de líderes de negocios o emprendedores.' },
-            { id: 10, word: 'Empathetic', phonetic: '/ˌem.pəˈθet.ɪk/', spa: 'Empático', example: 'An ambassador must be empathetic.', tip: 'Palabra clave en certámenes modernos.' },
-            { id: 11, word: 'Driven', phonetic: '/ˈdrɪv.ən/', spa: 'Motivado / Impulsado', example: 'I am driven by my family values.', tip: 'Significa que tienes un motor interno que te mueve.' },
-            { id: 12, word: 'Ready', phonetic: '/ˈred.i/', spa: 'Preparado / Listo', example: 'I am ready to take on this responsibility.', tip: 'Corto, directo y denota acción inmediata.' }
+            { id: 9, word: 'Visionary', phonetic: '/ˈvɪʒ.ən.ər.i/', spa: 'Visionario', example: 'I am a visionary for a better tomorrow.', tip: 'Para perfiles de líderes de negocios o empuje social.' },
+            { id: 10, word: 'Empathetic', phonetic: '/ˌem.pəˈθet.ɪk/', spa: 'Empático', example: 'An ambassador must be empathetic.', tip: 'Palabra clave y muy solicitada en certámenes modernos.' },
+            { id: 11, word: 'Driven', phonetic: '/ˈdrɪv.ən/', spa: 'Motivado / Impulsado', example: 'I am driven by my family values.', tip: 'Significa que tienes un motor interno inquebrantable.' },
+            { id: 12, word: 'Ready', phonetic: '/ˈred.i/', spa: 'Preparado / Listo', example: 'I am ready to take on this responsibility.', tip: 'Corto, contundente, directo. Denota acción inmediata.' }
         ];
 
         const SECTIONS = [
@@ -1025,17 +1050,17 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             { title: "Grammar Core", icon: "check-circle-2" },
             { title: "Build Formula", icon: "pen-tool" },
             { title: "Studio Prompter", icon: "monitor-play" },
-            { title: "Coach Eval", icon: "clipboard-check" }
+            { title: "Self Evaluation", icon: "clipboard-check" }
         ];
 
         // ==========================================
         // STATE MANAGEMENT
         // ==========================================
         let currentSectionIdx = 0;
-        let showTeacherNotes = false;
         let isPlaying = false;
         let animFrame;
-        let prompterFontSize = 50; // default for medium screens
+        // Default font size varies by screen width
+        let prompterFontSize = window.innerWidth < 768 ? 32 : (window.innerWidth < 1024 ? 44 : 56);
 
         // ==========================================
         // INITIALIZATION
@@ -1045,34 +1070,68 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             renderVocabGrid();
             lucide.createIcons();
             updateEval(); // Init sliders and scores
-            
-            // Check screen size for prompter font
-            if(window.innerWidth < 768) prompterFontSize = 30;
             updatePrompterFontCSS();
+            
+            // Handle window resize for prompter font bounds
+            window.addEventListener('resize', () => {
+                if(window.innerWidth < 768 && prompterFontSize > 40) {
+                    prompterFontSize = 32;
+                    updatePrompterFontCSS();
+                }
+            });
+        }
+
+        // ==========================================
+        // MOBILE MENU (SIDEBAR) LOGIC
+        // ==========================================
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            // Check if it's currently hidden/closed
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+
+            if (isClosed) {
+                // Open Menu
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                // Small delay to allow display:block to register before opacity transition
+                requestAnimationFrame(() => {
+                    overlay.classList.remove('opacity-0');
+                    overlay.classList.add('opacity-100');
+                });
+            } else {
+                // Close Menu
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+                // Wait for transition to finish before hiding display
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300); // Matches Tailwind's default duration-300
+            }
         }
 
         // ==========================================
         // TEXT-TO-SPEECH FUNCTIONALITY
         // ==========================================
         function speakText(text) {
-            // Check browser support
             if (!('speechSynthesis' in window)) {
-                alert("Tu navegador no soporta reproducción de voz. Intenta en Chrome o Safari modernos.");
+                alert("Tu navegador no soporta reproducción de voz. Por favor usa Chrome o Safari recientes.");
                 return;
             }
 
-            // Cancel any ongoing speech
+            // Cancel any ongoing speech to avoid queuing delays
             window.speechSynthesis.cancel();
 
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US'; // Default to US English
-            utterance.rate = 0.85; // Slightly slower for clarity and learning
-            utterance.pitch = 0.95; // Slightly deeper for a male/formal tone simulation
+            utterance.lang = 'en-US'; 
+            utterance.rate = 0.85; // Slower for clarity
+            utterance.pitch = 0.95; // Slightly deeper
 
-            // Try to find a clear, standard English voice
+            // Attempt to get a good English voice
             const voices = window.speechSynthesis.getVoices();
             if (voices.length > 0) {
-                // Prioritize Google US English, then any US English, then any English
                 const bestVoice = voices.find(v => v.name.includes('Google US English')) || 
                                   voices.find(v => v.lang === 'en-US' && v.name.includes('Male')) ||
                                   voices.find(v => v.lang === 'en-US') || 
@@ -1081,7 +1140,7 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
                     utterance.voice = bestVoice;
                 }
             } else {
-                // If voices aren't loaded yet, add event listener and try again
+                // Fallback if voices haven't loaded yet
                 speechSynthesis.onvoiceschanged = () => {
                     const newVoices = window.speechSynthesis.getVoices();
                     const best = newVoices.find(v => v.name.includes('Google US English')) || newVoices.find(v => v.lang === 'en-US');
@@ -1089,11 +1148,10 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
                 };
             }
 
-            // Visual feedback on the buttons (optional, handled by hover states mostly)
             window.speechSynthesis.speak(utterance);
         }
 
-        // Ensure voices are loaded early
+        // Trigger voice load early on mobile browsers
         if ('speechSynthesis' in window) {
             window.speechSynthesis.getVoices();
         }
@@ -1105,11 +1163,11 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             const navMenu = document.getElementById('nav-menu');
             navMenu.innerHTML = SECTIONS.map((sec, idx) => `
                 <li>
-                    <button onclick="goToSection(${idx})" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 relative overflow-hidden group ${idx === currentSectionIdx ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}">
+                    <button onclick="goToSection(${idx})" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 relative overflow-hidden group ${idx === currentSectionIdx ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200'}">
                         ${idx === currentSectionIdx ? '<div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>' : ''}
                         <i data-lucide="${sec.icon}" class="w-5 h-5 relative z-10 ${idx === currentSectionIdx ? 'text-white' : 'text-slate-400 group-hover:text-blue-500'} transition-colors"></i>
                         <span class="text-[13px] font-semibold tracking-wide text-left flex-1 relative z-10">${sec.title}</span>
-                        ${idx === currentSectionIdx ? '<i data-lucide="chevron-right" class="w-4 h-4 text-white/70 relative z-10"></i>' : ''}
+                        ${idx === currentSectionIdx ? '<i data-lucide="chevron-right" class="w-4 h-4 text-white/80 relative z-10"></i>' : ''}
                     </button>
                 </li>
             `).join('');
@@ -1117,20 +1175,27 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
         }
 
         function goToSection(idx) {
-            // Stop prompter & audio if moving away
+            // Stop teleprompter and audio if moving away
             if(isPlaying) togglePrompter();
             if('speechSynthesis' in window) window.speechSynthesis.cancel();
 
             // Hide all sections
             document.querySelectorAll('.section-container').forEach(el => {
-                el.classList.remove('block');
-                el.classList.remove('flex');
+                el.classList.remove('block', 'flex');
                 el.classList.add('hidden');
+                // Remove animation class to re-trigger it
+                el.classList.remove('animate-fade-in');
             });
             
-            // Show target section (Section 5 uses flex layout for the prompter)
+            // Show target section (Section 5 uses flex layout, others block)
             const target = document.getElementById(`section-${idx}`);
             target.classList.remove('hidden');
+            
+            // Re-add animation class for smooth entry
+            // Force reflow
+            void target.offsetWidth; 
+            target.classList.add('animate-fade-in');
+            
             if(idx === 5) {
                 target.classList.add('flex');
             } else {
@@ -1138,89 +1203,66 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             }
 
             // Smooth scroll main container to top
-            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' });
 
             currentSectionIdx = idx;
             renderNavMenu();
-        }
 
-        // ==========================================
-        // TEACHER NOTES (INSTRUCTOR MODE)
-        // ==========================================
-        function toggleTeacherNotes() {
-            showTeacherNotes = !showTeacherNotes;
-            const btn = document.getElementById('toggle-notes-btn');
-            const txt = document.getElementById('toggle-notes-text');
-            const notes = document.querySelectorAll('.teacher-note');
-            const globalAlert = document.getElementById('global-instructor-alert');
-
-            if (showTeacherNotes) {
-                btn.classList.replace('bg-white', 'bg-blue-600');
-                btn.classList.replace('text-slate-600', 'text-white');
-                btn.classList.replace('border-slate-200', 'border-blue-700');
-                btn.classList.replace('hover:bg-slate-50', 'hover:bg-blue-700');
-                txt.innerText = "Modo Instructor (ACTIVO)";
-                notes.forEach(n => {
-                    n.classList.remove('hidden');
-                    // Force reflow for animation
-                    void n.offsetWidth;
-                    n.classList.add('animate-fade-in');
-                });
-                globalAlert.classList.remove('hidden');
-            } else {
-                btn.classList.replace('bg-blue-600', 'bg-white');
-                btn.classList.replace('text-white', 'text-slate-600');
-                btn.classList.replace('border-blue-700', 'border-slate-200');
-                btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-50');
-                txt.innerText = "Modo Instructor (Oculto)";
-                notes.forEach(n => n.classList.add('hidden'));
-                globalAlert.classList.add('hidden');
+            // Auto-close mobile menu if open
+            if(window.innerWidth < 1024) { // lg breakpoint in Tailwind is 1024px
+                const sidebar = document.getElementById('sidebar');
+                if(!sidebar.classList.contains('-translate-x-full')) {
+                    toggleMobileMenu();
+                }
             }
-            
-            // Re-initialize icons inside newly visible elements
-            lucide.createIcons();
         }
 
         // ==========================================
         // DYNAMIC CONTENT RENDERERS
         // ==========================================
+        function toggleCardFlip(element) {
+            // Touch safe flipping
+            const inner = element.querySelector('.flip-inner');
+            inner.classList.toggle('rotate-y-180');
+        }
+
         function renderVocabGrid() {
             const grid = document.getElementById('vocab-grid');
             grid.innerHTML = ADJECTIVES.map(adj => `
-                <div class="h-[280px] cursor-pointer perspective-1000 group" onclick="this.querySelector('.flip-inner').classList.toggle('rotate-y-180')">
-                    <div class="flip-inner relative w-full h-full transition-transform duration-700 transform-style-3d">
+                <div class="h-[260px] md:h-[280px] cursor-pointer perspective-1000 group touch-manipulation" onclick="toggleCardFlip(this)">
+                    <div class="flip-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
                         
                         <!-- Front of Card -->
-                        <div class="absolute w-full h-full backface-hidden bg-white rounded-3xl p-6 flex flex-col items-center justify-center border-2 border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] group-hover:border-blue-400 transition-all glow-hover">
-                            <div class="absolute top-4 right-4 text-slate-300">
-                                <i data-lucide="mouse-pointer-click" class="w-5 h-5"></i>
+                        <div class="absolute w-full h-full backface-hidden bg-white rounded-[1.5rem] md:rounded-3xl p-5 md:p-6 flex flex-col items-center justify-center border border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.03)] group-hover:border-blue-400 transition-all glow-hover">
+                            <div class="absolute top-4 right-4 text-slate-300 opacity-50">
+                                <i data-lucide="mouse-pointer-click" class="w-4 h-4 md:w-5 md:h-5"></i>
                             </div>
-                            <div class="text-4xl font-bold text-slate-900 mb-4 serif-font text-center">${adj.word}</div>
+                            <div class="text-3xl md:text-4xl font-bold text-slate-900 mb-3 md:mb-4 serif-font text-center leading-tight">${adj.word}</div>
                             
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="text-blue-600 font-mono bg-blue-50 px-4 py-1.5 rounded-lg text-sm font-semibold border border-blue-100">${adj.phonetic}</div>
+                            <div class="flex items-center gap-2 md:gap-3 mb-2">
+                                <div class="text-blue-600 font-mono bg-blue-50 px-3 md:px-4 py-1.5 rounded-lg text-xs md:text-sm font-semibold border border-blue-100">${adj.phonetic}</div>
                                 <!-- Audio Button (Prevents card flip when clicked) -->
-                                <button onclick="event.stopPropagation(); speakText('${adj.word}')" class="bg-blue-100 hover:bg-blue-600 text-blue-600 hover:text-white p-2 rounded-lg transition-colors shadow-sm" title="Escuchar pronunciación">
-                                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                                <button onclick="event.stopPropagation(); speakText('${adj.word}')" class="bg-blue-100 hover:bg-blue-600 active:bg-blue-700 text-blue-600 hover:text-white p-2 md:p-2.5 rounded-lg transition-colors shadow-sm" title="Escuchar pronunciación">
+                                    <i data-lucide="volume-2" class="w-4 h-4 md:w-5 md:h-5"></i>
                                 </button>
                             </div>
                             
-                            <div class="absolute bottom-6 text-[11px] text-slate-400 uppercase tracking-widest font-bold flex items-center gap-1">
-                                Click para significado
+                            <div class="absolute bottom-5 text-[10px] text-slate-400 uppercase tracking-widest font-bold flex items-center gap-1">
+                                Toca para traducir
                             </div>
                         </div>
 
                         <!-- Back of Card (Flipped) -->
-                        <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-blue-700 to-indigo-900 rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-2xl border border-blue-500/30">
-                            <div class="text-3xl font-bold text-white mb-2">${adj.spa}</div>
-                            <div class="w-16 h-1 bg-blue-400 rounded-full mb-6"></div>
+                        <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-blue-700 to-indigo-900 rounded-[1.5rem] md:rounded-3xl p-6 md:p-8 flex flex-col items-center justify-center text-center shadow-xl border border-blue-500/30">
+                            <div class="text-2xl md:text-3xl font-bold text-white mb-2">${adj.spa}</div>
+                            <div class="w-12 md:w-16 h-1 bg-blue-400 rounded-full mb-4 md:mb-6 opacity-50"></div>
                             
-                            <p class="text-blue-100 text-sm italic font-medium leading-relaxed mb-4">"${adj.example}"</p>
+                            <p class="text-blue-100 text-xs md:text-sm italic font-medium leading-relaxed mb-4">"${adj.example}"</p>
                             
                             <!-- Context Tip inside back card -->
-                            <div class="mt-auto w-full bg-black/20 p-3 rounded-xl border border-white/10">
-                                <span class="block text-[10px] text-blue-300 uppercase tracking-wider font-bold mb-1"><i data-lucide="zap" class="w-3 h-3 inline pb-0.5"></i> Pro Tip</span>
-                                <span class="text-xs text-white opacity-90">${adj.tip}</span>
+                            <div class="mt-auto w-full bg-black/20 p-2.5 md:p-3 rounded-xl border border-white/10 backdrop-blur-sm">
+                                <span class="block text-[9px] md:text-[10px] text-blue-300 uppercase tracking-wider font-bold mb-0.5 md:mb-1"><i data-lucide="zap" class="w-3 h-3 inline pb-0.5"></i> Tip de Uso</span>
+                                <span class="text-[11px] md:text-xs text-white opacity-95 leading-snug block">${adj.tip}</span>
                             </div>
                         </div>
 
@@ -1234,7 +1276,7 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
         // FORMULA & SCRIPT GENERATOR
         // ==========================================
         function updateScript() {
-            // Get values
+            // Get values safely
             const nameRaw = document.getElementById('inp-name').value;
             const ageRaw = document.getElementById('inp-age').value;
             const causeRaw = document.getElementById('inp-cause').value;
@@ -1243,17 +1285,17 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             const adjSelect = document.getElementById('inp-adj');
             const adj = adjSelect.options[adjSelect.selectedIndex].text.split(' ')[0].toLowerCase();
 
-            // Set Preview (with defaults if empty)
+            // Set Preview (with visual defaults if empty)
             document.getElementById('out-name').innerText = nameRaw || '_____';
             document.getElementById('out-age').innerText = ageRaw || '___';
             document.getElementById('out-cause').innerText = causeRaw || '_____';
             document.getElementById('out-adj').innerText = adj;
             document.getElementById('out-country').innerText = countryRaw || '_____';
 
-            // Set Teleprompter Final Text
+            // Set Teleprompter Final Text (with placeholder defaults for reading)
             const pName = nameRaw || '[YOUR NAME]';
             const pAge = ageRaw || '[YOUR AGE]';
-            const pCause = causeRaw || '[YOUR PROFESSION/CAUSE]';
+            const pCause = causeRaw || '[YOUR PROFESSION]';
             const pCountry = countryRaw || 'MEXICO';
 
             const text = `GOOD EVENING DISTINGUISHED JUDGES AND AUDIENCE.\n\nMY NAME IS ${pName.toUpperCase()}.\nI AM ${pAge} YEARS OLD, AND I AM ${pCause.toUpperCase()}.\n\nI AM INCREDIBLY ${adj.toUpperCase()} TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE RESILIENT SPIRIT AND HERITAGE OF... ${pCountry}!`;
@@ -1262,13 +1304,17 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
         }
 
         // ==========================================
-        // TELEPROMPTER LOGIC
+        // TELEPROMPTER LOGIC (Optimized 60fps scrolling)
         // ==========================================
         function adjustPrompterFont(direction) {
-            prompterFontSize += (direction * 4);
-            // bounds
+            // Adjust step based on device type for finer control
+            const step = window.innerWidth < 768 ? 2 : 4; 
+            prompterFontSize += (direction * step);
+            
+            // Safety bounds
             if(prompterFontSize < 20) prompterFontSize = 20;
-            if(prompterFontSize > 100) prompterFontSize = 100;
+            if(prompterFontSize > 120) prompterFontSize = 120;
+            
             updatePrompterFontCSS();
         }
 
@@ -1295,10 +1341,11 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
                 // Show reading line more prominently
                 readingLine.classList.replace('opacity-50', 'opacity-100');
                 
-                // Ensure smooth scrolling is off for programmatic frame-by-frame scroll
+                // Ensure smooth scrolling is off for programmatic hardware-accelerated scroll
                 scroller.style.scrollBehavior = 'auto'; 
                 
-                scrollLoop();
+                // Start animation loop
+                animFrame = requestAnimationFrame(scrollLoop);
             } else {
                 // UI Changes to 'Paused' state
                 btn.classList.replace('bg-red-500', 'bg-blue-600');
@@ -1310,30 +1357,34 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
                 // Dim reading line
                 readingLine.classList.replace('opacity-100', 'opacity-50');
 
-                // Re-enable smooth scrolling for manual user scroll
+                // Re-enable smooth scrolling for manual touch scroll
                 scroller.style.scrollBehavior = 'smooth';
                 cancelAnimationFrame(animFrame);
             }
         }
 
         function scrollLoop() {
+            if (!isPlaying) return;
+
             // Speed factor from slider (0.5 to 5)
             const speedMultiplier = parseFloat(document.getElementById('prompter-speed').value);
             const scroller = document.getElementById('prompter-scroll');
             
-            // Adjust base speed pixel increment
-            scroller.scrollTop += (speedMultiplier * 0.8);
+            // Adjust base speed pixel increment (optimized for 60fps displays)
+            // Mobile screens usually need slightly slower relative pixel movement
+            const baseSpeed = window.innerWidth < 768 ? 0.6 : 1.0;
+            scroller.scrollTop += (speedMultiplier * baseSpeed);
             
-            // Auto-stop if we reach the absolute bottom
+            // Auto-stop if we reach the absolute bottom (with 2px threshold)
             if (scroller.scrollTop >= (scroller.scrollHeight - scroller.clientHeight - 2)) {
-                togglePrompter();
-            } else if (isPlaying) {
+                togglePrompter(); // Auto-pause
+            } else {
                 animFrame = requestAnimationFrame(scrollLoop);
             }
         }
 
         function resetPrompter() {
-            if(isPlaying) togglePrompter();
+            if(isPlaying) togglePrompter(); // Pause it first
             const scroller = document.getElementById('prompter-scroll');
             scroller.style.scrollBehavior = 'smooth';
             scroller.scrollTop = 0;
@@ -1347,20 +1398,23 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             let total = 0;
             sliders.forEach((slider, i) => {
                 const val = parseInt(slider.value);
+                const labelElement = document.getElementById(`val-${i+1}`);
+                
                 // Update specific percentage label
-                document.getElementById(`val-${i+1}`).innerText = val + '%';
-                // Color the track dynamically based on value
+                labelElement.innerText = val + '%';
+                
+                // Color the track dynamically based on value for visual feedback
                 slider.style.background = `linear-gradient(to right, #2563eb ${val}%, #e2e8f0 ${val}%)`;
                 total += val;
                 
-                // Change color logic based on performance
-                const labelElement = document.getElementById(`val-${i+1}`);
+                // Change color logic based on performance threshold
+                // Note: using responsive font sizes in the class assignment
                 if(val < 60) {
-                    labelElement.className = "text-amber-600 font-extrabold text-lg bg-amber-50 border border-amber-200 px-3 py-1 rounded-lg w-16 text-center";
+                    labelElement.className = "text-amber-600 font-extrabold text-base md:text-lg bg-amber-50 border border-amber-200 px-3 py-1 rounded-lg w-14 md:w-16 text-center";
                 } else if(val >= 85) {
-                    labelElement.className = "text-emerald-600 font-extrabold text-lg bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg w-16 text-center";
+                    labelElement.className = "text-emerald-600 font-extrabold text-base md:text-lg bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg w-14 md:w-16 text-center";
                 } else {
-                    labelElement.className = "text-blue-700 font-extrabold text-lg bg-blue-50 border border-blue-200 px-3 py-1 rounded-lg w-16 text-center";
+                    labelElement.className = "text-blue-700 font-extrabold text-base md:text-lg bg-blue-50 border border-blue-200 px-3 py-1 rounded-lg w-14 md:w-16 text-center";
                 }
             });
 
@@ -1373,24 +1427,24 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             scoreDisplay.innerText = avg + '%';
             finalCelebrationScore.innerText = avg + '%';
 
-            // Provide dynamic feedback message
+            // Provide dynamic feedback message based on overall average
             if(avg < 50) {
-                scoreDisplay.className = "text-7xl md:text-8xl font-black text-amber-500 serif-font tracking-tight text-shadow";
+                scoreDisplay.className = "text-6xl md:text-8xl font-black text-amber-500 serif-font tracking-tight text-shadow transition-colors duration-500";
                 msgDisplay.innerText = "Hay que trabajar los básicos. ¡La constancia es la clave!";
             } else if(avg < 80) {
-                scoreDisplay.className = "text-7xl md:text-8xl font-black text-white serif-font tracking-tight text-shadow";
+                scoreDisplay.className = "text-6xl md:text-8xl font-black text-white serif-font tracking-tight text-shadow transition-colors duration-500";
                 msgDisplay.innerText = "Un progreso sólido. Aún hay detalles técnicos por pulir.";
             } else if(avg < 95) {
-                scoreDisplay.className = "text-7xl md:text-8xl font-black text-blue-400 serif-font tracking-tight text-shadow text-glow";
+                scoreDisplay.className = "text-6xl md:text-8xl font-black text-blue-400 serif-font tracking-tight text-shadow text-glow transition-colors duration-500";
                 msgDisplay.innerText = "¡Nivel sobresaliente! Tienes madera de embajador.";
             } else {
-                scoreDisplay.className = "text-7xl md:text-8xl font-black text-emerald-400 serif-font tracking-tight text-shadow text-glow shimmer-text";
-                msgDisplay.innerText = "¡PERFECCIÓN! Listo para conquistar el escenario internacional.";
+                scoreDisplay.className = "text-6xl md:text-8xl font-black text-emerald-400 serif-font tracking-tight text-shadow text-glow shimmer-text transition-colors duration-500";
+                msgDisplay.innerText = "¡PERFECCIÓN! Listo para el escenario internacional.";
             }
         }
 
         // ==========================================
-        // CELEBRATION EFFECTS
+        // CELEBRATION EFFECTS (Optimized for Mobile)
         // ==========================================
         function triggerCelebration() {
             const overlay = document.getElementById('celebration-overlay');
@@ -1398,16 +1452,27 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
             // Premium color palette for confetti
             const colors = ['#2563eb', '#3b82f6', '#fbbf24', '#f59e0b', '#ffffff'];
             
-            container.innerHTML = ''; // Clear existing
+            container.innerHTML = ''; // Clear existing DOM nodes
             
-            // Create 100 confetti particles
-            for(let i = 0; i < 100; i++) {
+            // Adjust particle count based on screen size to maintain 60fps on phones
+            const particleCount = window.innerWidth < 768 ? 50 : 100;
+            
+            // DocumentFragment is much faster for DOM insertion
+            const fragment = document.createDocumentFragment();
+
+            for(let i = 0; i < particleCount; i++) {
                 const conf = document.createElement('div');
                 conf.className = 'confetti';
+                
+                // Random horizontal start position
                 conf.style.left = Math.random() * 100 + 'vw';
-                // Stagger animations
-                conf.style.animationDelay = Math.random() * 3 + 's';
-                conf.style.animationDuration = (Math.random() * 2 + 3) + 's'; // 3s to 5s fall
+                
+                // Stagger animations to avoid massive frame drop at frame 0
+                conf.style.animationDelay = Math.random() * 2 + 's';
+                
+                // Variable falling speeds
+                conf.style.animationDuration = (Math.random() * 2 + 3) + 's'; 
+                
                 conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                 
                 // Randomize shapes (circles, squares, thin rectangles)
@@ -1415,30 +1480,39 @@ I AM INCREDIBLY PROUD TO BE STANDING HERE TONIGHT, AND I PROUDLY REPRESENT THE R
                 if(shapeType > 0.6) {
                     conf.style.borderRadius = '50%'; // Circle
                 } else if(shapeType > 0.3) {
-                    conf.style.height = '20px'; // Rectangle
+                    conf.style.height = '16px'; // Thin Rectangle
                     conf.style.width = '6px';
                 }
                 
-                container.appendChild(conf);
+                fragment.appendChild(conf);
             }
             
-            // Show overlay with fade effect
+            container.appendChild(fragment);
+            
+            // Show overlay with fade effect (hardware accelerated)
             overlay.classList.remove('hidden');
+            // Small timeout allows display:block to calculate before opacity transition
             setTimeout(() => {
                 overlay.querySelector('div.bg-white\\/95').classList.remove('opacity-0');
             }, 50);
             
-            // Hide after 6 seconds
+            // Hide after 6 seconds and clean up DOM to free memory
             setTimeout(() => {
                 overlay.classList.add('hidden');
+                setTimeout(() => { container.innerHTML = ''; }, 500); // clear after fade out
             }, 6000);
             
-            // Play a subtle applause or success sound via TTS as a fun hack
-            speakText("Outstanding job! Class completed.");
+            // Play a subtle success sound via TTS
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance("Session complete. Outstanding job.");
+                utterance.lang = 'en-US';
+                utterance.rate = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
         }
 
-        // Initialize application when DOM is fully loaded
-        window.onload = initApp;
+        // Boot up the application when DOM is ready
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
